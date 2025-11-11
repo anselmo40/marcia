@@ -139,14 +139,14 @@ const playButton = document.getElementById('play');
 const startScreen = document.getElementById('start-screen');
 
 const music = new Audio('music.mp3');
-music.loop = false; // tocar apenas uma vez
-music.volume = 0;   // inicia no volume 0 para o fade-in
+music.loop = false;
+music.volume = 0;
 const duration = 150; // 2 minutos e 30 segundos
 
 let i = 0, line = 0;
 const speed = 70;
 
-// Função de digitação do texto
+// Função de digitação
 function type() {
   if (line < lines.length) {
     if (i < lines[line].length) {
@@ -163,35 +163,56 @@ function type() {
   }
 }
 
-// Função de fade-in e fade-out do áudio
-function fadeAudio(audio, duration) {
-  const fadeInTime = 5;  // segundos para subir o volume
-  const fadeOutTime = 10; // segundos finais de fade-out
-  const interval = 0.2;  // passo em segundos
+// Fade in/out de áudio e reinício
+function fadeAudioAndRestart(audio, duration) {
+  const fadeInTime = 5;   // segundos para aumentar o volume
+  const fadeOutTime = 10; // segundos finais para reduzir o volume
 
-  // Fade-in inicial
+  // Fade in
   const fadeIn = setInterval(() => {
     if (audio.volume < 1) audio.volume = Math.min(audio.volume + 0.02, 1);
     else clearInterval(fadeIn);
   }, fadeInTime * 20);
 
-  // Inicia fade-out antes de terminar
+  // Fade out e reinício
   setTimeout(() => {
     const fadeOut = setInterval(() => {
-      if (audio.volume > 0) audio.volume = Math.max(audio.volume - 0.02, 0);
-      else {
+      if (audio.volume > 0) {
+        audio.volume = Math.max(audio.volume - 0.02, 0);
+      } else {
         clearInterval(fadeOut);
         audio.pause();
+        smoothRestart();
       }
     }, fadeOutTime * 20);
   }, (duration - fadeOutTime) * 1000);
 }
 
+// Retorno suave à tela inicial
+function smoothRestart() {
+  document.body.style.transition = "opacity 2s ease-in-out";
+  document.body.style.opacity = "0";
+
+  setTimeout(() => {
+    // reset visual e lógica
+    terminal.textContent = "";
+    heart.classList.remove('reveal');
+    line = 0;
+    i = 0;
+
+    startScreen.style.display = "flex";
+    document.body.style.opacity = "1";
+  }, 2500);
+}
+
+// Evento do botão principal
 playButton.addEventListener('click', () => {
   startScreen.style.opacity = "0";
   setTimeout(() => {
     startScreen.style.display = "none";
-    music.play().then(() => fadeAudio(music, duration)).catch(() => console.log("Autoplay bloqueado"));
+    music.play()
+      .then(() => fadeAudioAndRestart(music, duration))
+      .catch(() => console.log("Autoplay bloqueado"));
     type();
   }, 500);
 });
@@ -200,6 +221,7 @@ playButton.addEventListener('click', () => {
 
 </body>
 </html>
+
 
 
 

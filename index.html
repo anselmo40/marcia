@@ -123,7 +123,7 @@
   <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
 
   <script>
-    const lines = [
+const lines = [
   "Inicializando sistema...\n",
   "Carregando lembranças...\n",
   "Compilando sorrisos...\n",
@@ -138,10 +138,13 @@ const heart = document.getElementById('heart');
 const playButton = document.getElementById('play');
 const startScreen = document.getElementById('start-screen');
 
-const music = new Audio('music.mp3');
+let music = new Audio('music.mp3');
 music.loop = false;
 music.volume = 0;
-const duration = 150; // 2 minutos e 30 segundos
+
+const duration = 150; // 2 min 30 s
+const fadeInTime = 5;   // segundos de fade-in
+const fadeOutTime = 10; // segundos de fade-out
 
 let i = 0, line = 0;
 const speed = 70;
@@ -163,29 +166,29 @@ function type() {
   }
 }
 
-// Fade in/out de áudio e reinício
-function fadeAudioAndRestart(audio, duration) {
-  const fadeInTime = 5;   // segundos para aumentar o volume
-  const fadeOutTime = 10; // segundos finais para reduzir o volume
+// Fade da música + reinício suave
+function playWithFade() {
+  music.currentTime = 0;
+  music.volume = 0;
+  music.play().then(() => {
+    // Fade in suave
+    const fadeIn = setInterval(() => {
+      if (music.volume < 1) music.volume = Math.min(music.volume + 0.02, 1);
+      else clearInterval(fadeIn);
+    }, fadeInTime * 20);
 
-  // Fade in
-  const fadeIn = setInterval(() => {
-    if (audio.volume < 1) audio.volume = Math.min(audio.volume + 0.02, 1);
-    else clearInterval(fadeIn);
-  }, fadeInTime * 20);
-
-  // Fade out e reinício
-  setTimeout(() => {
-    const fadeOut = setInterval(() => {
-      if (audio.volume > 0) {
-        audio.volume = Math.max(audio.volume - 0.02, 0);
-      } else {
-        clearInterval(fadeOut);
-        audio.pause();
-        smoothRestart();
-      }
-    }, fadeOutTime * 20);
-  }, (duration - fadeOutTime) * 1000);
+    // Fade out no final
+    setTimeout(() => {
+      const fadeOut = setInterval(() => {
+        if (music.volume > 0) music.volume = Math.max(music.volume - 0.02, 0);
+        else {
+          clearInterval(fadeOut);
+          music.pause();
+          smoothRestart();
+        }
+      }, fadeOutTime * 20);
+    }, (duration - fadeOutTime) * 1000);
+  }).catch(() => console.warn("Autoplay bloqueado."));
 }
 
 // Retorno suave à tela inicial
@@ -194,33 +197,37 @@ function smoothRestart() {
   document.body.style.opacity = "0";
 
   setTimeout(() => {
-    // reset visual e lógica
     terminal.textContent = "";
     heart.classList.remove('reveal');
     line = 0;
     i = 0;
 
+    // Recria o objeto de áudio para evitar falhas de replay
+    music = new Audio('music.mp3');
+    music.loop = false;
+    music.volume = 0;
+
     startScreen.style.display = "flex";
+    startScreen.style.opacity = "1";
     document.body.style.opacity = "1";
   }, 2500);
 }
 
-// Evento do botão principal
+// Botão principal
 playButton.addEventListener('click', () => {
   startScreen.style.opacity = "0";
   setTimeout(() => {
     startScreen.style.display = "none";
-    music.play()
-      .then(() => fadeAudioAndRestart(music, duration))
-      .catch(() => console.log("Autoplay bloqueado"));
+    playWithFade();
     type();
   }, 500);
 });
+</script>
 
-  </script>
 
 </body>
 </html>
+
 
 
 

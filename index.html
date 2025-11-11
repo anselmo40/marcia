@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feliz Aniversário, Márcia 💫</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: #0e0e0e;
+      color: #f2f2f2;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: left;
+      overflow: hidden;
+    }
+
+    .terminal {
+      background: transparent;
+      color: #e6d2b5;
+      font-size: 1.2rem;
+      padding: 25px 40px;
+      border-left: 2px solid #d6b88a;
+      white-space: pre;
+      line-height: 1.6;
+      min-width: 320px;
+      max-width: 600px;
+    }
+
+    .heart {
+      font-size: 2rem;
+      margin-top: 25px;
+      color: #ff2d55;
+      opacity: 0;
+      animation: pulse 1.5s infinite ease-in-out;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .reveal {
+      opacity: 1 !important;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    footer {
+      position: absolute;
+      bottom: 12px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    @media (max-width: 600px) {
+      .terminal {
+        font-size: 1rem;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="terminal" id="terminal"></div>
+  <div class="heart" id="heart">❤️</div>
+
+  <audio autoplay loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
+
+  <script>
+    const lines = [
+      "Inicializando sistema...\n",
+      "Carregando lembranças...\n",
+      "Compilando sorrisos...\n",
+      "Renderizando carinho...\n",
+      "Executando surpresa...\n",
+      "Output: Feliz aniversário, Márcia 💫\n",
+      "Você é a exceção mais linda da minha lógica ❤️"
+    ];
+
+    const terminal = document.getElementById('terminal');
+    const heart = document.getElementById('heart');
+    const speed = 70;
+    let i = 0, line = 0;
+
+    function type() {
+      if (line < lines.length) {
+        if (i < lines[line].length) {
+          terminal.textContent += lines[line].charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else {
+          i = 0;
+          line++;
+          setTimeout(() => { terminal.textContent += "\n"; type(); }, 400);
+        }
+      } else {
+        heart.classList.add('reveal');
+      }
+    }
+
+    window.onload = type;
+  </script>
+
+</body>
+</html>

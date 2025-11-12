@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feliz Aniversário, Márcia 💫</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: #0e0e0e;
+      color: #f2f2f2;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: left;
+      overflow: hidden;
+      transition: opacity 2s ease-in-out;
+    }
+
+    .terminal {
+      background: transparent;
+      color: #e6d2b5;
+      font-size: 1.2rem;
+      padding: 25px 40px;
+      border-left: 2px solid #d6b88a;
+      white-space: pre;
+      line-height: 1.6;
+      min-width: 320px;
+      max-width: 600px;
+      border-right: 2px solid #d6b88a;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    .heart {
+      font-size: 2rem;
+      margin-top: 25px;
+      color: #ff2d55;
+      opacity: 0;
+      animation: pulse 1.5s infinite ease-in-out;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .reveal {
+      opacity: 1 !important;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    footer {
+      position: absolute;
+      bottom: 12px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    #start-screen {
+      position: fixed;
+      inset: 0;
+      background: #0e0e0e;
+      color: #e6d2b5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      z-index: 10;
+      transition: opacity 1s ease-in-out;
+    }
+
+    #start-screen button {
+      background: #d6b88a;
+      color: #111;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 25px;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+
+    #start-screen button:hover {
+      background: #e6d2b5;
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 600px) {
+      .terminal {
+        font-size: 1rem;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="start-screen">
+    <p style="margin-bottom:15px;">Clique para iniciar a surpresa 🎧</p>
+    <button id="play">Iniciar 💫</button>
+  </div>
+
+  <div class="terminal" id="terminal"></div>
+  <div class="heart" id="heart">❤️</div>
+
+  <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
+
+  <script>
+    const lines = [
+      "Inicializando sistema...\n",
+      "Carregando lembranças...\n",
+      "Compilando sorrisos...\n",
+      "Renderizando carinho...\n",
+      "Executando surpresa...\n",
+      "Output: Feliz aniversário, Márcia 💫\n",
+      "Você é a exceção mais linda da minha lógica ❤️"
+    ];
+
+    const terminal = document.getElementById('terminal');
+    const heart = document.getElementById('heart');
+    const playButton = document.getElementById('play');
+    const startScreen = document.getElementById('start-screen');
+
+    let music = new Audio('music.mp3');
+    music.loop = false;
+    music.volume = 0.01; // mínimo necessário pro Chrome liberar o som
+
+    const duration = 150; // 2min30s
+    const fadeInTime = 5;
+    const fadeOutTime = 10;
+    let i = 0, line = 0;
+    const speed = 70;
+
+    function type() {
+      if (line < lines.length) {
+        if (i < lines[line].length) {
+          terminal.textContent += lines[line].charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else {
+          i = 0;
+          line++;
+          setTimeout(() => { terminal.textContent += "\n"; type(); }, 400);
+        }
+      } else {
+        heart.classList.add('reveal');
+      }
+    }
+
+    function playWithFade() {
+      music.currentTime = 0;
+      music.volume = 0.01;
+      music.play().then(() => {
+        // Fade in
+        const fadeIn = setInterval(() => {
+          if (music.volume < 1) music.volume = Math.min(music.volume + 0.02, 1);
+          else clearInterval(fadeIn);
+        }, fadeInTime * 20);
+
+        // Fade out no final
+        setTimeout(() => {
+          const fadeOut = setInterval(() => {
+            if (music.volume > 0) music.volume = Math.max(music.volume - 0.02, 0);
+            else {
+              clearInterval(fadeOut);
+              music.pause();
+              smoothRestart();
+            }
+          }, fadeOutTime * 20);
+        }, (duration - fadeOutTime) * 1000);
+      }).catch((err) => console.warn("Autoplay bloqueado:", err));
+    }
+
+    function smoothRestart() {
+      document.body.style.opacity = "0";
+      setTimeout(() => {
+        terminal.textContent = "";
+        heart.classList.remove('reveal');
+        line = 0; i = 0;
+        music = new Audio('music.mp3');
+        music.volume = 0.01;
+        startScreen.style.display = "flex";
+        document.body.style.opacity = "1";
+      }, 2500);
+    }
+
+    playButton.addEventListener('click', () => {
+      // O play precisa acontecer diretamente no evento de clique
+      music.play().catch(() => console.warn("Autoplay bloqueado no clique."));
+      music.pause(); // pausa imediatamente (garante desbloqueio)
+      startScreen.style.opacity = "0";
+      setTimeout(() => {
+        startScreen.style.display = "none";
+        playWithFade();
+        type();
+      }, 500);
+    });
+  </script>
+
+</body>
+</html>

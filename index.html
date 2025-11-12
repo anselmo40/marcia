@@ -138,7 +138,7 @@
 
     let music = new Audio('music.mp3');
     music.loop = false;
-    music.volume = 0.01; // mínimo necessário pro Chrome liberar o som
+    music.volume = 50; // mínimo necessário pro Chrome liberar o som
 
     const duration = 150; // 2min30s
     const fadeInTime = 5;
@@ -164,7 +164,7 @@
 
     function playWithFade() {
       music.currentTime = 0;
-      music.volume = 0.01;
+      music.volume = 50;
       music.play().then(() => {
         // Fade in
         const fadeIn = setInterval(() => {
@@ -193,7 +193,7 @@
         heart.classList.remove('reveal');
         line = 0; i = 0;
         music = new Audio('music.mp3');
-        music.volume = 0.01;
+        music.volume = 50;
         startScreen.style.display = "flex";
         document.body.style.opacity = "1";
       }, 2500);

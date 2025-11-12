@@ -121,126 +121,174 @@
   <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
 
    <script>
+/* ========= elementos ========= */
 const terminal = document.getElementById('terminal');
 const heart = document.getElementById('heart');
 const playButton = document.getElementById('play');
 const startScreen = document.getElementById('start-screen');
 
+/* ========= audio ========= */
 let music = new Audio('music.mp3');
 music.preload = 'auto';
 music.loop = false;
-music.volume = 0.5;
+music.volume = 0.5;                 // começa em 50%
 
-// Estrutura das falas com tempos e efeitos
-const lines = [
-  { text: "Inicializando sistema", delay: 7000, dots: true },
-  { text: "Carregando lembranças...", delay: 7000, dots: false },
-  { text: "Compilando sorrisos", delay: 10000, dots: true, play: true }, // começa música aqui
-  { text: "Renderizando carinho", delay: 9000, dots: true },
-  { text: "Executando surpresa", delay: 9000, dots: true },
-  { text: "Output: Feliz aniversário, Márcia 💫", delay: 7000, dots: false },
-  { text: "Você é a exceção mais linda da minha lógica ❤️", delay: 10000, dots: false }
-];
+/* ========= config ========= */
+const DURATION = 150;               // música ~2:30
+const FADE_IN_TIME = 5;             // s
+const FADE_OUT_TIME = 10;           // s finais
 
-let currentLine = 0;
-
-function typeLine(line) {
-  if (line.dots) {
-    // efeito de carregamento com pontinhos
-    terminal.textContent += line.text;
-    let dots = 0;
-    const loading = setInterval(() => {
-      dots = (dots + 1) % 4;
-      terminal.textContent = terminal.textContent.split('\n').slice(0, -1).join('\n') + "\n" + line.text + '.'.repeat(dots);
-    }, 500);
-
-    setTimeout(() => {
-      clearInterval(loading);
-      terminal.textContent += "\n";
-      nextLine();
-    }, line.delay);
-
-    // se for o momento de iniciar a música
-    if (line.play) {
-      setTimeout(() => {
-        playMusic();
-      }, 0); // toca imediatamente no "Compilando sorrisos"
-    }
-
-  } else {
-    // digitação normal letra por letra
-    let idx = 0;
-    const interval = setInterval(() => {
-      if (idx < line.text.length) {
-        terminal.textContent += line.text[idx++];
-      } else {
-        clearInterval(interval);
-        terminal.textContent += "\n";
-        setTimeout(nextLine, line.delay);
-      }
-    }, 100);
+/* Linha com pontinhos “...” piscando */
+let dotsTimer = null;
+function showDots(baseText) {
+  stopDots();
+  // escreve baseText na última linha e anima pontos
+  let dots = 0;
+  // garante que a última linha é essa
+  const lines = terminal.textContent.split('\n');
+  if (lines[lines.length - 1] !== baseText) {
+    terminal.textContent += (terminal.textContent.endsWith('\n') ? '' : '\n');
+    terminal.textContent += baseText;
+  }
+  dotsTimer = setInterval(() => {
+    dots = (dots + 1) % 4;
+    const arr = terminal.textContent.split('\n');
+    arr[arr.length - 1] = baseText + '.'.repeat(dots);
+    terminal.textContent = arr.join('\n');
+  }, 500);
+}
+function stopDots() {
+  if (dotsTimer) {
+    clearInterval(dotsTimer);
+    dotsTimer = null;
   }
 }
 
-function nextLine() {
-  if (currentLine < lines.length) {
-    typeLine(lines[currentLine]);
-    currentLine++;
-  } else {
-    heart.classList.add('reveal');
-    fadeOutMusic();
-  }
-}
-
-function playMusic() {
-  // começa a tocar aos 28 segundos
-  music.currentTime = 28;
-  music.play().then(() => fadeInMusic())
-  .catch(err => console.warn("Erro ao tocar música:", err));
-}
-
-function fadeInMusic() {
-  const fadeIn = setInterval(() => {
-    if (music.volume < 1) {
-      music.volume = Math.min(music.volume + 0.01, 1);
-    } else clearInterval(fadeIn);
-  }, 100);
-}
-
-function fadeOutMusic() {
-  const fadeOut = setInterval(() => {
-    if (music.volume > 0.02) {
-      music.volume = Math.max(music.volume - 0.02, 0);
+/* Digita uma linha “devagar” e quebra linha no fim */
+function typeLine(text, speed = 100, after = () => {}) {
+  stopDots();
+  let i = 0;
+  const tick = setInterval(() => {
+    if (i < text.length) {
+      terminal.textContent += text[i++];
     } else {
-      clearInterval(fadeOut);
+      clearInterval(tick);
+      terminal.textContent += '\n';
+      after();
+    }
+  }, speed);
+}
+
+/* Fade do áudio */
+function fadeInMusic() {
+  const step = 0.01;                        // granulação do fade
+  const iv = setInterval(() => {
+    if (music.volume < 1) music.volume = Math.min(music.volume + step, 1);
+    else clearInterval(iv);
+  }, FADE_IN_TIME * 20);
+}
+function fadeOutMusicAndRestart() {
+  const step = 0.02;
+  const iv = setInterval(() => {
+    if (music.volume > 0.02) music.volume = Math.max(music.volume - step, 0);
+    else {
+      clearInterval(iv);
       music.pause();
       smoothRestart();
     }
-  }, 200);
+  }, FADE_OUT_TIME * 20);
 }
 
+/* Volta para a tela inicial suavemente */
 function smoothRestart() {
   document.body.style.opacity = "0";
   setTimeout(() => {
+    // reset visual
     terminal.textContent = "";
     heart.classList.remove('reveal');
-    currentLine = 0;
+    // recria o áudio p/ evitar bug de segundo play
     music = new Audio('music.mp3');
     music.preload = 'auto';
     music.loop = false;
     music.volume = 0.5;
     startScreen.style.display = "flex";
     document.body.style.opacity = "1";
-  }, 2500);
+  }, 2000);
 }
 
+/* ========= timeline sincronizada pela música =========
+   - TUDO mede o time por music.currentTime
+   - Música começa no clique (t=0)
+   - 28s: entra “Compilando sorrisos…” com pontinhos
+   - Mantém pontinhos até “Executando surpresa…”
+*/
+const TIMELINE = [
+  // t=0  → já inicia com “Inicializando sistema ...” (pontinhos)
+  { at: 0,   action: () => showDots("Inicializando sistema") },
+
+  // t=12 → digita “Carregando lembranças...”
+  { at: 12,  action: () => typeLine("Carregando lembranças...", 100) },
+
+  // t=28 → começa “Compilando sorrisos” com pontinhos (voz entra)
+  { at: 28,  action: () => showDots("Compilando sorrisos") },
+
+  // t=40 → troca para “Renderizando carinho” com pontinhos
+  { at: 40,  action: () => showDots("Renderizando carinho") },
+
+  // t=52 → troca para “Executando surpresa” com pontinhos
+  { at: 52,  action: () => showDots("Executando surpresa") },
+
+  // t=64 → para pontinhos e digita “Output: ...”
+  { at: 64,  action: () => typeLine("Output: Feliz aniversário, Márcia 💫", 100) },
+
+  // t=76 → digita a frase final e mostra coração
+  { at: 76,  action: () => typeLine("Você é a exceção mais linda da minha lógica ❤️", 100, () => {
+      heart.classList.add('reveal');
+    })
+  },
+
+  // t= DURATION-FADE_OUT_TIME → começa fade-out e depois reinicia
+  { at: (DURATION - FADE_OUT_TIME), action: () => fadeOutMusicAndRestart() }
+];
+
+let timelineIndex = 0;
+let pollTimer = null;
+
+function startTimeline() {
+  // zera estado
+  timelineIndex = 0;
+  terminal.textContent = "";
+
+  // começa a tocar a música no clique (t=0)
+  music.currentTime = 0;
+  music.play().then(() => {
+    fadeInMusic();
+
+    // polling leve para disparar eventos na hora certa
+    pollTimer = setInterval(() => {
+      const t = music.currentTime;
+      while (timelineIndex < TIMELINE.length && t >= TIMELINE[timelineIndex].at) {
+        TIMELINE[timelineIndex].action();
+        timelineIndex++;
+      }
+      // segurança: se passou do fim, para o polling
+      if (timelineIndex >= TIMELINE.length) {
+        clearInterval(pollTimer);
+      }
+    }, 100); // checa a cada 100ms
+  }).catch(err => {
+    console.warn("Audio play bloqueado:", err);
+  });
+}
+
+/* ========= clique do botão ========= */
 playButton.addEventListener('click', () => {
+  // some a tela inicial
   startScreen.style.opacity = "0";
   setTimeout(() => {
     startScreen.style.display = "none";
-    terminal.textContent = "";
-    nextLine();
-  }, 500);
+    startTimeline();
+  }, 400);
 });
 </script>
 

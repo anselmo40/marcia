@@ -136,12 +136,16 @@ const heart = document.getElementById('heart');
 const playButton = document.getElementById('play');
 const startScreen = document.getElementById('start-screen');
 
+let music = new Audio('music.mp3');
+music.preload = 'auto';
+music.loop = false;
+music.volume = 0.5; // volume inicial de 50%
+
+const duration = 150; // 2:30
+const fadeInTime = 5; // segundos
+const fadeOutTime = 10;
 let i = 0, line = 0;
 const speed = 70;
-const duration = 150; // 2min30s
-const fadeInTime = 5;
-const fadeOutTime = 10;
-let music;
 
 function type() {
   if (line < lines.length) {
@@ -159,36 +163,34 @@ function type() {
   }
 }
 
-function playMusic() {
-  if (!music) {
-    music = new Audio('music.mp3');
-    music.preload = 'auto';
-    music.loop = false;
-    music.volume = 50;
-  }
+function playWithFade() {
+  music.currentTime = 0;
+  music.volume = 0.5;
 
-  const fadeIn = setInterval(() => {
-    if (music.volume < 1) {
-      music.volume = Math.min(music.volume + 0.02, 1);
-    } else {
-      clearInterval(fadeIn);
-    }
-  }, fadeInTime * 20);
-
-  music.play().catch(err => console.warn("O navegador bloqueou o som:", err));
-
-  // Fade out suave no final
-  setTimeout(() => {
-    const fadeOut = setInterval(() => {
-      if (music.volume > 0) {
-        music.volume = Math.max(music.volume - 0.02, 0);
+  // toca a música (já desbloqueada pelo clique)
+  music.play().then(() => {
+    // fade in inicial
+    const fadeIn = setInterval(() => {
+      if (music.volume < 1) {
+        music.volume = Math.min(music.volume + 0.01, 1);
       } else {
-        clearInterval(fadeOut);
-        music.pause();
-        smoothRestart();
+        clearInterval(fadeIn);
       }
-    }, fadeOutTime * 20);
-  }, (duration - fadeOutTime) * 1000);
+    }, fadeInTime * 20);
+
+    // fade out no final
+    setTimeout(() => {
+      const fadeOut = setInterval(() => {
+        if (music.volume > 0.01) {
+          music.volume = Math.max(music.volume - 0.02, 0);
+        } else {
+          clearInterval(fadeOut);
+          music.pause();
+          smoothRestart();
+        }
+      }, fadeOutTime * 20);
+    }, (duration - fadeOutTime) * 1000);
+  }).catch(err => console.warn("Erro ao tocar música:", err));
 }
 
 function smoothRestart() {
@@ -196,22 +198,28 @@ function smoothRestart() {
   setTimeout(() => {
     terminal.textContent = "";
     heart.classList.remove('reveal');
-    line = 0; i = 0;
-    music = null;
+    line = 0;
+    i = 0;
+    // recria o objeto de áudio pra evitar bug do Chrome
+    music = new Audio('music.mp3');
+    music.preload = 'auto';
+    music.loop = false;
+    music.volume = 0.5;
     startScreen.style.display = "flex";
     document.body.style.opacity = "1";
   }, 2500);
 }
 
-playButton.addEventListener('click', async () => {
+playButton.addEventListener('click', () => {
   startScreen.style.opacity = "0";
-  await new Promise(r => setTimeout(r, 400));
-  startScreen.style.display = "none";
-
-  type();
-  playMusic();
+  setTimeout(() => {
+    startScreen.style.display = "none";
+    type();
+    playWithFade();
+  }, 500);
 });
 </script>
+
 
 
 </body>

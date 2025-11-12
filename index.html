@@ -131,16 +131,14 @@ music.preload = 'auto';
 music.loop = false;
 music.volume = 0.5;
 
-/* ==== CONFIGURAÇÕES ==== */
 const DURATION = 150;
 const FADE_IN_TIME = 5;
 const FADE_OUT_TIME = 10;
 
-/* ==== VARIÁVEIS ==== */
 let activeDots = {};
 let currentLine = -1;
 
-/* ==== FUNÇÕES DE ANIMAÇÃO ==== */
+/* ==== Funções de exibição ==== */
 function newLine(text = "") {
   currentLine++;
   const lines = terminal.textContent.split("\n");
@@ -182,7 +180,7 @@ function typeLine(text, speed = 100, after = () => {}) {
   }, speed);
 }
 
-/* ==== ÁUDIO ==== */
+/* ==== Controle da música ==== */
 function fadeInMusic() {
   const step = 0.01;
   const fade = setInterval(() => {
@@ -204,8 +202,11 @@ function fadeOutMusicAndRestart() {
   }, FADE_OUT_TIME * 20);
 }
 
+/* ==== Retorno suave à tela inicial ==== */
 function smoothRestart() {
+  document.body.style.transition = "opacity 2s ease-in-out";
   document.body.style.opacity = "0";
+
   setTimeout(() => {
     terminal.textContent = "";
     heart.classList.remove('reveal');
@@ -213,13 +214,15 @@ function smoothRestart() {
     music.preload = 'auto';
     music.loop = false;
     music.volume = 0.5;
-    startScreen.style.display = "flex";
-    document.body.style.opacity = "1";
+
     currentLine = -1;
-  }, 2000);
+    startScreen.style.display = "flex";
+    startScreen.style.opacity = "1";
+    document.body.style.opacity = "1";
+  }, 2500);
 }
 
-/* ==== TIMELINE ==== */
+/* ==== Timeline da animação ==== */
 const TIMELINE = [
   { at: 0, action: () => showDots("Inicializando sistema") },
   { at: 12, action: () => showDots("Carregando lembranças") },
@@ -242,6 +245,7 @@ const TIMELINE = [
 let timelineIndex = 0;
 let pollTimer = null;
 
+/* ==== Execução principal ==== */
 function startTimeline() {
   terminal.textContent = "";
   currentLine = -1;
@@ -260,7 +264,7 @@ function startTimeline() {
   }).catch(err => console.warn("Erro ao iniciar áudio:", err));
 }
 
-/* ==== EVENTO DO BOTÃO ==== */
+/* ==== Botão principal ==== */
 playButton.addEventListener("click", () => {
   startScreen.style.opacity = "0";
   setTimeout(() => {
@@ -269,6 +273,7 @@ playButton.addEventListener("click", () => {
   }, 400);
 });
 </script>
+
 
 
 

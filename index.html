@@ -121,16 +121,6 @@
   <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
 
    <script>
-const lines = [
-  "Inicializando sistema...\n",
-  "Carregando lembranças...\n",
-  "Compilando sorrisos...\n",
-  "Renderizando carinho...\n",
-  "Executando surpresa...\n",
-  "Output: Feliz aniversário, Márcia 💫\n",
-  "Você é a exceção mais linda da minha lógica ❤️"
-];
-
 const terminal = document.getElementById('terminal');
 const heart = document.getElementById('heart');
 const playButton = document.getElementById('play');
@@ -139,61 +129,90 @@ const startScreen = document.getElementById('start-screen');
 let music = new Audio('music.mp3');
 music.preload = 'auto';
 music.loop = false;
-music.volume = 0.5; // volume inicial
+music.volume = 0.5;
 
-// duração total da música (em segundos)
-const duration = 150; // 2min30s
-const fadeInTime = 5;
-const fadeOutTime = 10;
+// frases em ordem de exibição
+const lines = [
+  { text: "Inicializando sistema", delay: 7000, dots: true },
+  { text: "Carregando lembranças...", delay: 8000 },
+  { text: "Compilando sorrisos...", delay: 8000 },
+  { text: "Renderizando carinho...", delay: 8000 },
+  { text: "Executando surpresa...", delay: 6000 },
+  { text: "Output: Feliz aniversário, Márcia 💫", delay: 6000 },
+  { text: "Você é a exceção mais linda da minha lógica ❤️", delay: 9000 }
+];
 
-// controle da velocidade de digitação
-let i = 0, line = 0;
-const speed = 100; // mais lento (100ms por letra)
-const lineDelay = 1500; // pausa entre linhas (1.5s)
+let currentLine = 0;
+let i = 0;
 
-function type() {
-  if (line < lines.length) {
-    if (i < lines[line].length) {
-      terminal.textContent += lines[line].charAt(i);
-      i++;
-      setTimeout(type, speed);
-    } else {
-      i = 0;
-      line++;
-      setTimeout(() => { terminal.textContent += "\n"; type(); }, lineDelay);
-    }
+function typeLine(line) {
+  if (line.dots) {
+    // animação especial dos 3 pontinhos
+    terminal.textContent = line.text;
+    let dots = 0;
+    const loading = setInterval(() => {
+      dots = (dots + 1) % 4; // 0,1,2,3
+      terminal.textContent = line.text + '.'.repeat(dots);
+    }, 500);
+
+    setTimeout(() => {
+      clearInterval(loading);
+      terminal.textContent += "\n";
+      nextLine();
+    }, line.delay);
   } else {
-    heart.classList.add('reveal');
+    // digitação normal letra por letra
+    let text = line.text;
+    let idx = 0;
+    const interval = setInterval(() => {
+      if (idx < text.length) {
+        terminal.textContent += text[idx++];
+      } else {
+        clearInterval(interval);
+        terminal.textContent += "\n";
+        setTimeout(nextLine, line.delay);
+      }
+    }, 100); // velocidade da digitação
   }
 }
 
-function playWithFade() {
+function nextLine() {
+  if (currentLine < lines.length) {
+    typeLine(lines[currentLine]);
+    currentLine++;
+  } else {
+    heart.classList.add('reveal');
+    fadeOutMusic();
+  }
+}
+
+function playMusic() {
   music.currentTime = 0;
-  music.volume = 0.5;
-
   music.play().then(() => {
-    // fade-in inicial
-    const fadeIn = setInterval(() => {
-      if (music.volume < 1) {
-        music.volume = Math.min(music.volume + 0.01, 1);
-      } else {
-        clearInterval(fadeIn);
-      }
-    }, fadeInTime * 20);
-
-    // fade-out suave no final
-    setTimeout(() => {
-      const fadeOut = setInterval(() => {
-        if (music.volume > 0.01) {
-          music.volume = Math.max(music.volume - 0.02, 0);
-        } else {
-          clearInterval(fadeOut);
-          music.pause();
-          smoothRestart();
-        }
-      }, fadeOutTime * 20);
-    }, (duration - fadeOutTime) * 1000);
+    fadeInMusic();
   }).catch(err => console.warn("Erro ao tocar música:", err));
+}
+
+function fadeInMusic() {
+  const fadeIn = setInterval(() => {
+    if (music.volume < 1) {
+      music.volume = Math.min(music.volume + 0.01, 1);
+    } else {
+      clearInterval(fadeIn);
+    }
+  }, 100);
+}
+
+function fadeOutMusic() {
+  const fadeOut = setInterval(() => {
+    if (music.volume > 0.02) {
+      music.volume = Math.max(music.volume - 0.02, 0);
+    } else {
+      clearInterval(fadeOut);
+      music.pause();
+      smoothRestart();
+    }
+  }, 200);
 }
 
 function smoothRestart() {
@@ -201,9 +220,8 @@ function smoothRestart() {
   setTimeout(() => {
     terminal.textContent = "";
     heart.classList.remove('reveal');
-    line = 0;
+    currentLine = 0;
     i = 0;
-    // recria o objeto de áudio
     music = new Audio('music.mp3');
     music.preload = 'auto';
     music.loop = false;
@@ -217,12 +235,12 @@ playButton.addEventListener('click', () => {
   startScreen.style.opacity = "0";
   setTimeout(() => {
     startScreen.style.display = "none";
-    type();
-    playWithFade();
+    terminal.textContent = "";
+    playMusic();
+    nextLine();
   }, 500);
 });
 </script>
-
 
 
 

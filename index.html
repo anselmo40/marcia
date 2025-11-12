@@ -131,28 +131,27 @@ music.preload = 'auto';
 music.loop = false;
 music.volume = 0.5;
 
-// frases em ordem de exibição
+// Estrutura das falas com tempos e efeitos
 const lines = [
   { text: "Inicializando sistema", delay: 7000, dots: true },
-  { text: "Carregando lembranças...", delay: 8000 },
-  { text: "Compilando sorrisos...", delay: 8000 },
-  { text: "Renderizando carinho...", delay: 8000 },
-  { text: "Executando surpresa...", delay: 6000 },
-  { text: "Output: Feliz aniversário, Márcia 💫", delay: 6000 },
-  { text: "Você é a exceção mais linda da minha lógica ❤️", delay: 9000 }
+  { text: "Carregando lembranças...", delay: 7000, dots: false },
+  { text: "Compilando sorrisos", delay: 10000, dots: true, play: true }, // começa música aqui
+  { text: "Renderizando carinho", delay: 9000, dots: true },
+  { text: "Executando surpresa", delay: 9000, dots: true },
+  { text: "Output: Feliz aniversário, Márcia 💫", delay: 7000, dots: false },
+  { text: "Você é a exceção mais linda da minha lógica ❤️", delay: 10000, dots: false }
 ];
 
 let currentLine = 0;
-let i = 0;
 
 function typeLine(line) {
   if (line.dots) {
-    // animação especial dos 3 pontinhos
-    terminal.textContent = line.text;
+    // efeito de carregamento com pontinhos
+    terminal.textContent += line.text;
     let dots = 0;
     const loading = setInterval(() => {
-      dots = (dots + 1) % 4; // 0,1,2,3
-      terminal.textContent = line.text + '.'.repeat(dots);
+      dots = (dots + 1) % 4;
+      terminal.textContent = terminal.textContent.split('\n').slice(0, -1).join('\n') + "\n" + line.text + '.'.repeat(dots);
     }, 500);
 
     setTimeout(() => {
@@ -160,19 +159,26 @@ function typeLine(line) {
       terminal.textContent += "\n";
       nextLine();
     }, line.delay);
+
+    // se for o momento de iniciar a música
+    if (line.play) {
+      setTimeout(() => {
+        playMusic();
+      }, 0); // toca imediatamente no "Compilando sorrisos"
+    }
+
   } else {
     // digitação normal letra por letra
-    let text = line.text;
     let idx = 0;
     const interval = setInterval(() => {
-      if (idx < text.length) {
-        terminal.textContent += text[idx++];
+      if (idx < line.text.length) {
+        terminal.textContent += line.text[idx++];
       } else {
         clearInterval(interval);
         terminal.textContent += "\n";
         setTimeout(nextLine, line.delay);
       }
-    }, 100); // velocidade da digitação
+    }, 100);
   }
 }
 
@@ -187,19 +193,17 @@ function nextLine() {
 }
 
 function playMusic() {
-  music.currentTime = 0;
-  music.play().then(() => {
-    fadeInMusic();
-  }).catch(err => console.warn("Erro ao tocar música:", err));
+  // começa a tocar aos 28 segundos
+  music.currentTime = 28;
+  music.play().then(() => fadeInMusic())
+  .catch(err => console.warn("Erro ao tocar música:", err));
 }
 
 function fadeInMusic() {
   const fadeIn = setInterval(() => {
     if (music.volume < 1) {
       music.volume = Math.min(music.volume + 0.01, 1);
-    } else {
-      clearInterval(fadeIn);
-    }
+    } else clearInterval(fadeIn);
   }, 100);
 }
 
@@ -221,7 +225,6 @@ function smoothRestart() {
     terminal.textContent = "";
     heart.classList.remove('reveal');
     currentLine = 0;
-    i = 0;
     music = new Audio('music.mp3');
     music.preload = 'auto';
     music.loop = false;
@@ -236,11 +239,11 @@ playButton.addEventListener('click', () => {
   setTimeout(() => {
     startScreen.style.display = "none";
     terminal.textContent = "";
-    playMusic();
     nextLine();
   }, 500);
 });
 </script>
+
 
 
 

@@ -136,11 +136,13 @@ const DURATION = 150;       // duração da música (~2:30)
 const FADE_IN_TIME = 5;
 const FADE_OUT_TIME = 10;
 
-/* ==== FUNÇÕES AUXILIARES ==== */
+/* ==== VARIÁVEIS DE CONTROLE ==== */
 let activeDots = {};
+let currentLine = 0;
 
-function showDots(lineId, baseText) {
-  stopDots(lineId);
+/* ==== FUNÇÕES DE ANIMAÇÃO ==== */
+function showDots(baseText) {
+  const lineId = currentLine++;
   if (!terminal.textContent.endsWith('\n')) terminal.textContent += '\n';
   terminal.textContent += baseText;
 
@@ -153,24 +155,26 @@ function showDots(lineId, baseText) {
   }, 500);
 }
 
-function stopDots(lineId) {
-  if (activeDots[lineId]) {
-    clearInterval(activeDots[lineId]);
-    delete activeDots[lineId];
+function stopAllDots() {
+  for (let id in activeDots) {
+    clearInterval(activeDots[id]);
   }
+  activeDots = {};
 }
 
 function typeLine(text, speed = 100, after = () => {}) {
   let i = 0;
   if (!terminal.textContent.endsWith('\n')) terminal.textContent += '\n';
-  const startLen = terminal.textContent.split('\n').length - 1;
+  const lineId = currentLine++;
+  terminal.textContent += '';
   const tick = setInterval(() => {
     if (i < text.length) {
-      terminal.textContent += text[i++];
+      const lines = terminal.textContent.split('\n');
+      lines[lineId] = (lines[lineId] || '') + text[i++];
+      terminal.textContent = lines.join('\n');
     } else {
       clearInterval(tick);
-      terminal.textContent += '\n';
-      after(startLen);
+      after();
     }
   }, speed);
 }
@@ -213,11 +217,11 @@ function smoothRestart() {
 
 /* ==== TIMELINE SINCRONIZADA ==== */
 const TIMELINE = [
-  { at: 0, action: () => showDots(0, "Inicializando sistema") },
-  { at: 12, action: () => showDots(1, "Carregando lembranças") },
-  { at: 28, action: () => showDots(2, "Compilando sorrisos") },
-  { at: 40, action: () => showDots(3, "Renderizando carinho") },
-  { at: 52, action: () => showDots(4, "Executando surpresa") },
+  { at: 0, action: () => showDots("Inicializando sistema") },
+  { at: 12, action: () => showDots("Carregando lembranças") },
+  { at: 28, action: () => showDots("Compilando sorrisos") },
+  { at: 40, action: () => showDots("Renderizando carinho") },
+  { at: 52, action: () => showDots("Executando surpresa") },
   { at: 64, action: () => {
       stopAllDots();
       typeLine("Output: Feliz aniversário, Márcia 💫", 100);
@@ -230,15 +234,13 @@ const TIMELINE = [
   { at: DURATION - FADE_OUT_TIME, action: () => fadeOutMusicAndRestart() }
 ];
 
-function stopAllDots() {
-  Object.keys(activeDots).forEach(id => stopDots(id));
-}
-
 let timelineIndex = 0;
 let pollTimer = null;
 
 function startTimeline() {
   terminal.textContent = "";
+  currentLine = 0;
+  timelineIndex = 0;
   music.currentTime = 0;
   music.play().then(() => {
     fadeInMusic();
@@ -262,6 +264,7 @@ playButton.addEventListener('click', () => {
   }, 400);
 });
 </script>
+
 
 
 

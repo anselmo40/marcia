@@ -136,18 +136,13 @@ const heart = document.getElementById('heart');
 const playButton = document.getElementById('play');
 const startScreen = document.getElementById('start-screen');
 
-let music = new Audio('music.mp3');
-music.loop = false;
-music.volume = 0;
-music.preload = 'auto';
-
+let music;
+let i = 0, line = 0;
+const speed = 70;
 const duration = 150; // 2min30s
 const fadeInTime = 5;
 const fadeOutTime = 10;
-let i = 0, line = 0;
-const speed = 70;
 
-// Função de digitação
 function type() {
   if (line < lines.length) {
     if (i < lines[line].length) {
@@ -164,12 +159,19 @@ function type() {
   }
 }
 
-// Fade + reinício suave
 function playWithFade() {
+  if (!music) {
+    music = new Audio('music.mp3');
+    music.preload = 'auto';
+    music.loop = false;
+  }
+
   music.currentTime = 0;
   music.volume = 0;
+
+  // tocar de fato
   music.play().then(() => {
-    // Fade in
+    // fade in suave
     const fadeIn = setInterval(() => {
       if (music.volume < 1) {
         music.volume = Math.min(music.volume + 0.02, 1);
@@ -178,7 +180,7 @@ function playWithFade() {
       }
     }, fadeInTime * 20);
 
-    // Fade out no final
+    // fade out antes do fim
     setTimeout(() => {
       const fadeOut = setInterval(() => {
         if (music.volume > 0) {
@@ -190,39 +192,32 @@ function playWithFade() {
         }
       }, fadeOutTime * 20);
     }, (duration - fadeOutTime) * 1000);
-  }).catch(err => console.warn("Autoplay bloqueado:", err));
+  }).catch((err) => {
+    console.warn("Erro ao tocar música:", err);
+    alert("Clique novamente para permitir o áudio 🎧");
+  });
 }
 
-// Retorno suave
 function smoothRestart() {
   document.body.style.opacity = "0";
   setTimeout(() => {
     terminal.textContent = "";
     heart.classList.remove('reveal');
     line = 0; i = 0;
-    music = new Audio('music.mp3');
-    music.loop = false;
-    music.volume = 0;
     startScreen.style.display = "flex";
     document.body.style.opacity = "1";
   }, 2500);
 }
 
-// Evento do botão (garante o desbloqueio do áudio)
 playButton.addEventListener('click', () => {
-  music.play().then(() => {
-    music.pause(); // desbloqueia o som
-    music.currentTime = 0;
-    startScreen.style.opacity = "0";
-    setTimeout(() => {
-      startScreen.style.display = "none";
-      playWithFade();
-      type();
-    }, 500);
-  }).catch(() => {
-    console.warn("O navegador bloqueou o áudio — clique novamente se não tocar.");
-  });
+  startScreen.style.opacity = "0";
+  setTimeout(() => {
+    startScreen.style.display = "none";
+    playWithFade();
+    type();
+  }, 500);
 });
 </script>
+
 </body>
 </html>

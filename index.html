@@ -20,7 +20,6 @@
       transition:opacity 1.5s ease-in-out;
     }
 
-    /* Terminal */
     .terminal{
       width: min(860px,92%);
       max-width:860px;
@@ -48,7 +47,6 @@
 
     footer{position:absolute;bottom:10px;color:#666;font-size:.85rem}
 
-    /* start screen */
     #start-screen{
       position:fixed;
       inset:0;
@@ -77,7 +75,6 @@
     }
     #start-screen button:hover{transform:scale(1.03);background:#e6d2b5}
 
-    /* modal senha */
     #authModal{
       position:fixed;
       inset:0;
@@ -106,6 +103,16 @@
     .countdown{margin-top:10px;color:#cfcfcf;font-size:.95rem}
     .authMsg{margin-top:8px;color:#f4a7a7;font-size:.92rem;min-height:20px}
 
+    /* Fade suave para dica */
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 1.2s forwards ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     @media (max-width:600px){
       .terminal{padding:18px;font-size:0.95rem}
       .authBox{padding:16px}
@@ -114,14 +121,12 @@
 </head>
 <body>
 
-  <!-- Start screen -->
   <div id="start-screen">
     <p>Clique para iniciar a surpresa 🎧</p>
     <button id="openAuth">Iniciar 💫</button>
     <small style="color:#888;margin-top:8px">Você terá que digitar uma senha para liberar o presente</small>
   </div>
 
-  <!-- Modal de autenticação -->
   <div id="authModal" aria-hidden="true">
     <div class="authBox" role="dialog" aria-modal="true">
       <div style="font-weight:600;font-size:1.05rem">Autenticação necessária</div>
@@ -134,24 +139,22 @@
 
       <div class="authMsg" id="authMsg"></div>
       <div class="countdown" id="countdown"></div>
-      <div style="margin-top:12px;color:#999;font-size:.9rem">Dica: é algo que ilumina o rosto antes mesmo das palavras aparecerem😁</div>
+      <div id="passwordHint" style="margin-top:12px;color:#999;font-size:.9rem;display:none">
+        Dica: é algo que ilumina o rosto antes mesmo das palavras aparecerem 😁
+      </div>
     </div>
   </div>
 
-  <!-- Terminal display -->
   <div class="terminal" id="terminal" aria-live="polite"></div>
   <div class="heart" id="heart">❤️</div>
 
   <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
 
 <script>
-/* ================= SETTINGS ================= */
-const RELEASE_DATE = new Date(2025, 10, 12, 0, 0, 0); // 15 Nov 2025 00:00:00 local (month index 10 = Nov)
-const SECRET = "sorriso"; // senha escolhida
-const MUSIC_FILE = "music.mp3"; // deve estar na mesma pasta
-/* ============================================ */
+const RELEASE_DATE = new Date(2025, 11, 12, 0, 0, 0);
+const SECRET = "sorriso";
+const MUSIC_FILE = "music.mp3";
 
-/* elementos */
 const startScreen = document.getElementById('start-screen');
 const openAuth = document.getElementById('openAuth');
 const authModal = document.getElementById('authModal');
@@ -159,28 +162,23 @@ const passwordInput = document.getElementById('passwordInput');
 const submitPass = document.getElementById('submitPass');
 const authMsg = document.getElementById('authMsg');
 const countdownEl = document.getElementById('countdown');
-
 const terminal = document.getElementById('terminal');
 const heart = document.getElementById('heart');
 
-/* áudio (preparado mas tocado apenas quando autorização OK e dentro das regras) */
 let music = new Audio(MUSIC_FILE);
 music.preload = 'auto';
 music.loop = false;
 music.volume = 0.5;
 
-/* timeline config (mesmos times que ajustamos) */
 const DURATION = 150;
 const FADE_IN_TIME = 5;
 const FADE_OUT_TIME = 10;
 
-/* timeline actions (reutilizamos o mecanismo sincronizado) */
 let activeDots = {};
 let currentLine = -1;
 let timelineIndex = 0;
 let pollTimer = null;
 
-/* timeline table */
 const TIMELINE = [
   { at: 0, action: () => showDots("Inicializando sistema") },
   { at: 12, action: () => showDots("Carregando lembranças") },
@@ -200,7 +198,6 @@ const TIMELINE = [
   { at: DURATION - FADE_OUT_TIME, action: () => fadeOutMusicAndRestart() }
 ];
 
-/* ================= helpers (terminal) ================= */
 function newLine(text=""){
   currentLine++;
   const lines = terminal.textContent.split("\n");
@@ -242,7 +239,6 @@ function typeLine(text, speed=100, after=()=>{}){
   }, speed);
 }
 
-/* ================= audio helpers ================= */
 function fadeInMusic(){
   const step = 0.01;
   const iv = setInterval(()=>{
@@ -280,20 +276,15 @@ function smoothRestart(){
   }, 2200);
 }
 
-/* ================= timeline runner ================= */
 function startTimeline(){
-  // reset
   terminal.textContent = "";
   currentLine = -1;
   timelineIndex = 0;
-
-  // começa a tocar a música a partir do início
   music.currentTime = 0;
   const playPromise = music.play();
   if (playPromise !== undefined) {
     playPromise.then(()=>{
       fadeInMusic();
-      // polling para timeline
       pollTimer = setInterval(()=>{
         const t = music.currentTime;
         while (timelineIndex < TIMELINE.length && t >= TIMELINE[timelineIndex].at){
@@ -303,15 +294,13 @@ function startTimeline(){
         if (timelineIndex >= TIMELINE.length) clearInterval(pollTimer);
       }, 100);
     }).catch(err => {
-      // se o navegador bloquear (raro, pois estamos em interação direta no submit)
       console.warn("Erro ao reproduzir (play):", err);
       alert("O navegador bloqueou a reprodução automática do áudio. Clique novamente em 'Liberar' para tentar.");
-      openAuthModal(); // volta pro modal
+      openAuthModal();
     });
   }
 }
 
-/* ================= auth & countdown logic ================= */
 function nowIsReleased(){
   const now = new Date();
   return now >= RELEASE_DATE;
@@ -332,7 +321,7 @@ function startCountdown(){
   function tick(){
     const now = new Date();
     const diff = RELEASE_DATE - now;
-    if (diff <= 0){ // liberado
+    if (diff <= 0){ 
       countdownEl.textContent = "O sistema já pode ser liberado hoje. Digite a senha.";
       clearInterval(countdownInterval);
       return;
@@ -344,73 +333,65 @@ function startCountdown(){
   countdownInterval = setInterval(tick, 1000);
 }
 
-/* abre modal */
 function openAuthModal(){
   authModal.style.display = "flex";
   authModal.setAttribute('aria-hidden','false');
   passwordInput.value = "";
   authMsg.textContent = "";
   countdownEl.textContent = "";
-  // se ainda não liberado, mostrar contagem
   if (!nowIsReleased()) startCountdown();
   passwordInput.focus();
 }
 
-/* fecha modal */
 function closeAuthModal(){
   authModal.style.display = "none";
   authModal.setAttribute('aria-hidden','true');
 }
 
-/* valida senha quando clicar em "Liberar" */
-function handleAuthSubmit(){
+function handleAuthSubmit() {
   const typed = (passwordInput.value || "").trim();
-  // sempre re-checa a data
-  if (!nowIsReleased()){
+
+  if (!nowIsReleased()) {
     authMsg.style.color = "#f4a7a7";
     authMsg.textContent = "Acesso negado. O sistema só será liberado na data marcada.";
-    // já tem countdown rodando
     if (!countdownInterval) startCountdown();
     return;
   }
-  // está liberado no tempo: ainda pede a senha (opção B)
-  if (typed === SECRET){
+
+  if (typed === SECRET) {
     authMsg.style.color = "#b7f4c9";
     authMsg.textContent = "Senha correta — iniciando a surpresa...";
-    // close modal and start flow (must be direct user interaction)
-    setTimeout(()=>{
+    document.getElementById("passwordHint").style.display = "none";
+
+    setTimeout(() => {
       closeAuthModal();
       startScreen.style.opacity = "0";
-      setTimeout(()=>{ startScreen.style.display = "none"; startTimeline(); }, 450);
+      setTimeout(() => {
+        startScreen.style.display = "none";
+        startTimeline();
+      }, 450);
     }, 450);
   } else {
     authMsg.style.color = "#f4a7a7";
     authMsg.textContent = "Senha incorreta. Tente novamente.";
     passwordInput.focus();
+
+    const hint = document.getElementById("passwordHint");
+    if (hint.style.display === "none" || !hint.style.display) {
+      hint.style.display = "block";
+      hint.classList.add("fade-in");
+    }
   }
 }
 
-/* ================= eventos UI ================= */
-openAuth.addEventListener('click', ()=>{
-  openAuthModal();
-});
-
+openAuth.addEventListener('click', ()=>{ openAuthModal(); });
 submitPass.addEventListener('click', handleAuthSubmit);
 passwordInput.addEventListener('keydown', (e)=>{
   if (e.key === "Enter") handleAuthSubmit();
 });
-
-/* fecha modal ao clicar fora */
 authModal.addEventListener('click', (e)=>{
-  if (e.target === authModal){
-    // fechar
-    closeAuthModal();
-  }
+  if (e.target === authModal){ closeAuthModal(); }
 });
-
-/* ================= ready notice ================= */
-// se quiser, pode mostrar no console as instruções
-console.log("Página pronta. Senha para teste (quando liberado):", SECRET);
 </script>
 </body>
 </html>

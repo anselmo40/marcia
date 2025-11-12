@@ -120,97 +120,109 @@
 
   <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
 
-  <script>
-    const lines = [
-      "Inicializando sistema...\n",
-      "Carregando lembranças...\n",
-      "Compilando sorrisos...\n",
-      "Renderizando carinho...\n",
-      "Executando surpresa...\n",
-      "Output: Feliz aniversário, Márcia 💫\n",
-      "Você é a exceção mais linda da minha lógica ❤️"
-    ];
+    <script>
+const lines = [
+  "Inicializando sistema...\n",
+  "Carregando lembranças...\n",
+  "Compilando sorrisos...\n",
+  "Renderizando carinho...\n",
+  "Executando surpresa...\n",
+  "Output: Feliz aniversário, Márcia 💫\n",
+  "Você é a exceção mais linda da minha lógica ❤️"
+];
 
-    const terminal = document.getElementById('terminal');
-    const heart = document.getElementById('heart');
-    const playButton = document.getElementById('play');
-    const startScreen = document.getElementById('start-screen');
+const terminal = document.getElementById('terminal');
+const heart = document.getElementById('heart');
+const playButton = document.getElementById('play');
+const startScreen = document.getElementById('start-screen');
 
-    let music = new Audio('music.mp3');
-    music.loop = false;
-    music.volume = 50; // mínimo necessário pro Chrome liberar o som
+let music = new Audio('music.mp3');
+music.loop = false;
+music.volume = 0;
+music.preload = 'auto';
 
-    const duration = 150; // 2min30s
-    const fadeInTime = 5;
-    const fadeOutTime = 10;
-    let i = 0, line = 0;
-    const speed = 70;
+const duration = 150; // 2min30s
+const fadeInTime = 5;
+const fadeOutTime = 10;
+let i = 0, line = 0;
+const speed = 70;
 
-    function type() {
-      if (line < lines.length) {
-        if (i < lines[line].length) {
-          terminal.textContent += lines[line].charAt(i);
-          i++;
-          setTimeout(type, speed);
-        } else {
-          i = 0;
-          line++;
-          setTimeout(() => { terminal.textContent += "\n"; type(); }, 400);
-        }
+// Função de digitação
+function type() {
+  if (line < lines.length) {
+    if (i < lines[line].length) {
+      terminal.textContent += lines[line].charAt(i);
+      i++;
+      setTimeout(type, speed);
+    } else {
+      i = 0;
+      line++;
+      setTimeout(() => { terminal.textContent += "\n"; type(); }, 400);
+    }
+  } else {
+    heart.classList.add('reveal');
+  }
+}
+
+// Fade + reinício suave
+function playWithFade() {
+  music.currentTime = 0;
+  music.volume = 0;
+  music.play().then(() => {
+    // Fade in
+    const fadeIn = setInterval(() => {
+      if (music.volume < 1) {
+        music.volume = Math.min(music.volume + 0.02, 1);
       } else {
-        heart.classList.add('reveal');
+        clearInterval(fadeIn);
       }
-    }
+    }, fadeInTime * 20);
 
-    function playWithFade() {
-      music.currentTime = 0;
-      music.volume = 50;
-      music.play().then(() => {
-        // Fade in
-        const fadeIn = setInterval(() => {
-          if (music.volume < 1) music.volume = Math.min(music.volume + 0.02, 1);
-          else clearInterval(fadeIn);
-        }, fadeInTime * 20);
+    // Fade out no final
+    setTimeout(() => {
+      const fadeOut = setInterval(() => {
+        if (music.volume > 0) {
+          music.volume = Math.max(music.volume - 0.02, 0);
+        } else {
+          clearInterval(fadeOut);
+          music.pause();
+          smoothRestart();
+        }
+      }, fadeOutTime * 20);
+    }, (duration - fadeOutTime) * 1000);
+  }).catch(err => console.warn("Autoplay bloqueado:", err));
+}
 
-        // Fade out no final
-        setTimeout(() => {
-          const fadeOut = setInterval(() => {
-            if (music.volume > 0) music.volume = Math.max(music.volume - 0.02, 0);
-            else {
-              clearInterval(fadeOut);
-              music.pause();
-              smoothRestart();
-            }
-          }, fadeOutTime * 20);
-        }, (duration - fadeOutTime) * 1000);
-      }).catch((err) => console.warn("Autoplay bloqueado:", err));
-    }
+// Retorno suave
+function smoothRestart() {
+  document.body.style.opacity = "0";
+  setTimeout(() => {
+    terminal.textContent = "";
+    heart.classList.remove('reveal');
+    line = 0; i = 0;
+    music = new Audio('music.mp3');
+    music.loop = false;
+    music.volume = 0;
+    startScreen.style.display = "flex";
+    document.body.style.opacity = "1";
+  }, 2500);
+}
 
-    function smoothRestart() {
-      document.body.style.opacity = "0";
-      setTimeout(() => {
-        terminal.textContent = "";
-        heart.classList.remove('reveal');
-        line = 0; i = 0;
-        music = new Audio('music.mp3');
-        music.volume = 50;
-        startScreen.style.display = "flex";
-        document.body.style.opacity = "1";
-      }, 2500);
-    }
-
-    playButton.addEventListener('click', () => {
-      // O play precisa acontecer diretamente no evento de clique
-      music.play().catch(() => console.warn("Autoplay bloqueado no clique."));
-      music.pause(); // pausa imediatamente (garante desbloqueio)
-      startScreen.style.opacity = "0";
-      setTimeout(() => {
-        startScreen.style.display = "none";
-        playWithFade();
-        type();
-      }, 500);
-    });
-  </script>
-
+// Evento do botão (garante o desbloqueio do áudio)
+playButton.addEventListener('click', () => {
+  music.play().then(() => {
+    music.pause(); // desbloqueia o som
+    music.currentTime = 0;
+    startScreen.style.opacity = "0";
+    setTimeout(() => {
+      startScreen.style.display = "none";
+      playWithFade();
+      type();
+    }, 500);
+  }).catch(() => {
+    console.warn("O navegador bloqueou o áudio — clique novamente se não tocar.");
+  });
+});
+</script>
 </body>
 </html>

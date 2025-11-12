@@ -139,13 +139,17 @@ const startScreen = document.getElementById('start-screen');
 let music = new Audio('music.mp3');
 music.preload = 'auto';
 music.loop = false;
-music.volume = 0.5; // volume inicial de 50%
+music.volume = 0.5; // volume inicial
 
-const duration = 150; // 2:30
-const fadeInTime = 5; // segundos
+// duração total da música (em segundos)
+const duration = 150; // 2min30s
+const fadeInTime = 5;
 const fadeOutTime = 10;
+
+// controle da velocidade de digitação
 let i = 0, line = 0;
-const speed = 70;
+const speed = 100; // mais lento (100ms por letra)
+const lineDelay = 1500; // pausa entre linhas (1.5s)
 
 function type() {
   if (line < lines.length) {
@@ -156,7 +160,7 @@ function type() {
     } else {
       i = 0;
       line++;
-      setTimeout(() => { terminal.textContent += "\n"; type(); }, 400);
+      setTimeout(() => { terminal.textContent += "\n"; type(); }, lineDelay);
     }
   } else {
     heart.classList.add('reveal');
@@ -167,9 +171,8 @@ function playWithFade() {
   music.currentTime = 0;
   music.volume = 0.5;
 
-  // toca a música (já desbloqueada pelo clique)
   music.play().then(() => {
-    // fade in inicial
+    // fade-in inicial
     const fadeIn = setInterval(() => {
       if (music.volume < 1) {
         music.volume = Math.min(music.volume + 0.01, 1);
@@ -178,7 +181,7 @@ function playWithFade() {
       }
     }, fadeInTime * 20);
 
-    // fade out no final
+    // fade-out suave no final
     setTimeout(() => {
       const fadeOut = setInterval(() => {
         if (music.volume > 0.01) {
@@ -200,7 +203,7 @@ function smoothRestart() {
     heart.classList.remove('reveal');
     line = 0;
     i = 0;
-    // recria o objeto de áudio pra evitar bug do Chrome
+    // recria o objeto de áudio
     music = new Audio('music.mp3');
     music.preload = 'auto';
     music.loop = false;
@@ -219,6 +222,7 @@ playButton.addEventListener('click', () => {
   }, 500);
 });
 </script>
+
 
 
 

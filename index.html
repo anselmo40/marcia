@@ -121,92 +121,87 @@
   <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
 
    <script>
-/* ========= elementos ========= */
 const terminal = document.getElementById('terminal');
 const heart = document.getElementById('heart');
 const playButton = document.getElementById('play');
 const startScreen = document.getElementById('start-screen');
 
-/* ========= audio ========= */
 let music = new Audio('music.mp3');
 music.preload = 'auto';
 music.loop = false;
-music.volume = 0.5;                 // começa em 50%
+music.volume = 0.5;
 
-/* ========= config ========= */
-const DURATION = 150;               // música ~2:30
-const FADE_IN_TIME = 5;             // s
-const FADE_OUT_TIME = 10;           // s finais
+/* ==== CONFIGURAÇÕES ==== */
+const DURATION = 150;       // duração da música (~2:30)
+const FADE_IN_TIME = 5;
+const FADE_OUT_TIME = 10;
 
-/* Linha com pontinhos “...” piscando */
-let dotsTimer = null;
-function showDots(baseText) {
-  stopDots();
-  // escreve baseText na última linha e anima pontos
+/* ==== FUNÇÕES AUXILIARES ==== */
+let activeDots = {};
+
+function showDots(lineId, baseText) {
+  stopDots(lineId);
+  if (!terminal.textContent.endsWith('\n')) terminal.textContent += '\n';
+  terminal.textContent += baseText;
+
   let dots = 0;
-  // garante que a última linha é essa
-  const lines = terminal.textContent.split('\n');
-  if (lines[lines.length - 1] !== baseText) {
-    terminal.textContent += (terminal.textContent.endsWith('\n') ? '' : '\n');
-    terminal.textContent += baseText;
-  }
-  dotsTimer = setInterval(() => {
+  activeDots[lineId] = setInterval(() => {
     dots = (dots + 1) % 4;
-    const arr = terminal.textContent.split('\n');
-    arr[arr.length - 1] = baseText + '.'.repeat(dots);
-    terminal.textContent = arr.join('\n');
+    const lines = terminal.textContent.split('\n');
+    lines[lineId] = baseText + '.'.repeat(dots);
+    terminal.textContent = lines.join('\n');
   }, 500);
 }
-function stopDots() {
-  if (dotsTimer) {
-    clearInterval(dotsTimer);
-    dotsTimer = null;
+
+function stopDots(lineId) {
+  if (activeDots[lineId]) {
+    clearInterval(activeDots[lineId]);
+    delete activeDots[lineId];
   }
 }
 
-/* Digita uma linha “devagar” e quebra linha no fim */
 function typeLine(text, speed = 100, after = () => {}) {
-  stopDots();
   let i = 0;
+  if (!terminal.textContent.endsWith('\n')) terminal.textContent += '\n';
+  const startLen = terminal.textContent.split('\n').length - 1;
   const tick = setInterval(() => {
     if (i < text.length) {
       terminal.textContent += text[i++];
     } else {
       clearInterval(tick);
       terminal.textContent += '\n';
-      after();
+      after(startLen);
     }
   }, speed);
 }
 
-/* Fade do áudio */
+/* ==== ÁUDIO ==== */
 function fadeInMusic() {
-  const step = 0.01;                        // granulação do fade
-  const iv = setInterval(() => {
+  const step = 0.01;
+  const fade = setInterval(() => {
     if (music.volume < 1) music.volume = Math.min(music.volume + step, 1);
-    else clearInterval(iv);
+    else clearInterval(fade);
   }, FADE_IN_TIME * 20);
 }
+
 function fadeOutMusicAndRestart() {
   const step = 0.02;
-  const iv = setInterval(() => {
-    if (music.volume > 0.02) music.volume = Math.max(music.volume - step, 0);
-    else {
-      clearInterval(iv);
+  const fade = setInterval(() => {
+    if (music.volume > 0.02) {
+      music.volume = Math.max(music.volume - step, 0);
+    } else {
+      clearInterval(fade);
       music.pause();
       smoothRestart();
     }
   }, FADE_OUT_TIME * 20);
 }
 
-/* Volta para a tela inicial suavemente */
 function smoothRestart() {
   document.body.style.opacity = "0";
   setTimeout(() => {
-    // reset visual
     terminal.textContent = "";
     heart.classList.remove('reveal');
-    // recria o áudio p/ evitar bug de segundo play
     music = new Audio('music.mp3');
     music.preload = 'auto';
     music.loop = false;
@@ -216,74 +211,50 @@ function smoothRestart() {
   }, 2000);
 }
 
-/* ========= timeline sincronizada pela música =========
-   - TUDO mede o time por music.currentTime
-   - Música começa no clique (t=0)
-   - 28s: entra “Compilando sorrisos…” com pontinhos
-   - Mantém pontinhos até “Executando surpresa…”
-*/
+/* ==== TIMELINE SINCRONIZADA ==== */
 const TIMELINE = [
-  // t=0  → já inicia com “Inicializando sistema ...” (pontinhos)
-  { at: 0,   action: () => showDots("Inicializando sistema") },
-
-  // t=12 → digita “Carregando lembranças...”
-  { at: 12,  action: () => typeLine("Carregando lembranças...", 100) },
-
-  // t=28 → começa “Compilando sorrisos” com pontinhos (voz entra)
-  { at: 28,  action: () => showDots("Compilando sorrisos") },
-
-  // t=40 → troca para “Renderizando carinho” com pontinhos
-  { at: 40,  action: () => showDots("Renderizando carinho") },
-
-  // t=52 → troca para “Executando surpresa” com pontinhos
-  { at: 52,  action: () => showDots("Executando surpresa") },
-
-  // t=64 → para pontinhos e digita “Output: ...”
-  { at: 64,  action: () => typeLine("Output: Feliz aniversário, Márcia 💫", 100) },
-
-  // t=76 → digita a frase final e mostra coração
-  { at: 76,  action: () => typeLine("Você é a exceção mais linda da minha lógica ❤️", 100, () => {
+  { at: 0, action: () => showDots(0, "Inicializando sistema") },
+  { at: 12, action: () => showDots(1, "Carregando lembranças") },
+  { at: 28, action: () => showDots(2, "Compilando sorrisos") },
+  { at: 40, action: () => showDots(3, "Renderizando carinho") },
+  { at: 52, action: () => showDots(4, "Executando surpresa") },
+  { at: 64, action: () => {
+      stopAllDots();
+      typeLine("Output: Feliz aniversário, Márcia 💫", 100);
+    }
+  },
+  { at: 76, action: () => typeLine("Você é a exceção mais linda da minha lógica ❤️", 100, () => {
       heart.classList.add('reveal');
     })
   },
-
-  // t= DURATION-FADE_OUT_TIME → começa fade-out e depois reinicia
-  { at: (DURATION - FADE_OUT_TIME), action: () => fadeOutMusicAndRestart() }
+  { at: DURATION - FADE_OUT_TIME, action: () => fadeOutMusicAndRestart() }
 ];
+
+function stopAllDots() {
+  Object.keys(activeDots).forEach(id => stopDots(id));
+}
 
 let timelineIndex = 0;
 let pollTimer = null;
 
 function startTimeline() {
-  // zera estado
-  timelineIndex = 0;
   terminal.textContent = "";
-
-  // começa a tocar a música no clique (t=0)
   music.currentTime = 0;
   music.play().then(() => {
     fadeInMusic();
-
-    // polling leve para disparar eventos na hora certa
     pollTimer = setInterval(() => {
       const t = music.currentTime;
       while (timelineIndex < TIMELINE.length && t >= TIMELINE[timelineIndex].at) {
         TIMELINE[timelineIndex].action();
         timelineIndex++;
       }
-      // segurança: se passou do fim, para o polling
-      if (timelineIndex >= TIMELINE.length) {
-        clearInterval(pollTimer);
-      }
-    }, 100); // checa a cada 100ms
-  }).catch(err => {
-    console.warn("Audio play bloqueado:", err);
-  });
+      if (timelineIndex >= TIMELINE.length) clearInterval(pollTimer);
+    }, 100);
+  }).catch(err => console.warn("Erro ao iniciar áudio:", err));
 }
 
-/* ========= clique do botão ========= */
+/* ==== EVENTO DO BOTÃO ==== */
 playButton.addEventListener('click', () => {
-  // some a tela inicial
   startScreen.style.opacity = "0";
   setTimeout(() => {
     startScreen.style.display = "none";
@@ -291,7 +262,6 @@ playButton.addEventListener('click', () => {
   }, 400);
 });
 </script>
-
 
 
 

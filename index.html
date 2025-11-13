@@ -2,10 +2,11 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1" />
   <title>Feliz Aniversário, Márcia 💫</title>
+
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color: transparent;}
     html,body{height:100%}
     body{
       height:100vh;
@@ -18,12 +19,14 @@
       flex-direction:column;
       overflow:hidden;
       transition:opacity 1.5s ease-in-out;
+      -webkit-text-size-adjust:100%;
     }
 
+    /* Terminal */
     .terminal{
       width: min(860px,92%);
       max-width:860px;
-      padding:30px 36px;
+      padding:28px 32px;
       color:#e6d2b5;
       background:transparent;
       border-left:2px solid #d6b88a;
@@ -31,22 +34,40 @@
       white-space:pre-wrap;
       line-height:1.6;
       min-height:220px;
-      min-width:320px;
+      min-width:280px;
       margin-bottom:18px;
       font-size:1.05rem;
+      word-break:break-word;
     }
 
+    /* Coração com animação pulsante */
     .heart{
-      font-size:2rem;
+      font-size:2.6rem;
       color:#ff2d55;
       opacity:0;
       transition:opacity .8s ease-in-out;
-      margin-top:6px;
+      margin-top:10px;
+      animation: pulse 1.35s infinite ease-in-out;
     }
     .heart.reveal{opacity:1}
 
-    footer{position:absolute;bottom:10px;color:#666;font-size:.85rem}
+    @keyframes pulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.33); }
+      100% { transform: scale(1); }
+    }
 
+    /* Footer */
+    footer{
+      position:absolute;
+      bottom:12px;
+      color:#666;
+      font-size:.85rem;
+      text-align:center;
+      width:100%;
+    }
+
+    /* Tela inicial */
     #start-screen{
       position:fixed;
       inset:0;
@@ -59,22 +80,24 @@
       flex-direction:column;
       gap:14px;
       color:#e6d2b5;
-      font-family:'Courier New',monospace;
+      text-align:center;
+      padding:20px;
     }
     #start-screen p{font-size:1.05rem}
     #start-screen button{
       background:#d6b88a;
       color:#111;
       border:none;
-      padding:10px 26px;
-      border-radius:26px;
+      padding:12px 28px;
+      border-radius:30px;
       cursor:pointer;
       font-family:'Courier New',monospace;
       font-size:1rem;
-      transition:transform .15s ease, background .15s ease;
+      transition:transform .2s ease, background .2s ease;
     }
-    #start-screen button:hover{transform:scale(1.03);background:#e6d2b5}
+    #start-screen button:hover{transform:scale(1.04);background:#e6d2b5}
 
+    /* Modal senha */
     #authModal{
       position:fixed;
       inset:0;
@@ -82,7 +105,8 @@
       align-items:center;
       justify-content:center;
       z-index:80;
-      background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.75));
+      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.78));
+      padding:20px;
     }
     .authBox{
       background:#0f0f0f;
@@ -90,45 +114,76 @@
       padding:22px;
       width: min(460px,92%);
       color:#e6d2b5;
-      border-radius:10px;
+      border-radius:12px;
       box-shadow: 0 6px 30px rgba(0,0,0,0.6);
-      font-family:'Courier New',monospace;
+      text-align:left;
     }
     .authRow{display:flex;gap:8px;align-items:center;margin-top:12px}
     .authRow input{
-      flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:#0e0e0e;color:#f2f2f2;
+      flex:1;
+      padding:12px;
+      border-radius:8px;
+      border:1px solid #333;
+      background:#0e0e0e;
+      color:#f2f2f2;
       font-family:'Courier New',monospace;
+      font-size:1rem;
     }
-    .authRow button{padding:10px 14px;border-radius:8px;border:none;background:#d6b88a;color:#111;cursor:pointer}
-    .countdown{margin-top:10px;color:#cfcfcf;font-size:.95rem}
-    .authMsg{margin-top:8px;color:#f4a7a7;font-size:.92rem;min-height:20px}
+    .authRow button{
+      padding:12px 16px;
+      border-radius:8px;
+      border:none;
+      background:#d6b88a;
+      color:#111;
+      cursor:pointer;
+      font-size:1rem;
+    }
+    .authMsg{
+      margin-top:10px;
+      min-height:22px;
+      font-size:.95rem;
+    }
+    .countdown{
+      margin-top:8px;
+      color:#cfcfcf;
+      font-size:.9rem;
+    }
 
-    /* Fade suave para dica */
+    /* Dica animada */
     .fade-in {
       opacity: 0;
-      animation: fadeIn 1.2s forwards ease-in-out;
+      animation: fadeIn 1s forwards ease-in-out;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(5px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Responsividade iPhone */
     @media (max-width:600px){
-      .terminal{padding:18px;font-size:0.95rem}
-      .authBox{padding:16px}
+      .terminal{padding:16px;font-size:.95rem}
+      .heart{font-size:2.3rem}
+      #start-screen p{font-size:.95rem}
+      .authBox{padding:18px}
+      .authRow input{padding:10px}
+      .authRow button{padding:10px 14px}
     }
   </style>
 </head>
+
 <body>
 
+  <!-- TELA INICIAL -->
   <div id="start-screen">
     <p>Clique para iniciar a surpresa 🎧</p>
     <button id="openAuth">Iniciar 💫</button>
     <small style="color:#888;margin-top:8px">Você terá que digitar uma senha para liberar o presente</small>
   </div>
 
+  <!-- MODAL SENHA -->
   <div id="authModal" aria-hidden="true">
     <div class="authBox" role="dialog" aria-modal="true">
+
       <div style="font-weight:600;font-size:1.05rem">Autenticação necessária</div>
       <div style="margin-top:8px;color:#bdbdbd">Digite a senha para liberar a surpresa.</div>
 
@@ -139,31 +194,29 @@
 
       <div class="authMsg" id="authMsg"></div>
       <div class="countdown" id="countdown"></div>
-      <div id="passwordHint" style="margin-top:12px;color:#999;font-size:.9rem;display:none">
-        Dica: Cinco letras que têm o poder de transformar o dia de alguém. E curiosamente… combinam perfeitamente com o seu ‘novo sobrenome’. 😉
+
+      <div id="passwordHint"
+           style="margin-top:12px;color:#999;font-size:.9rem;display:none">
+        Dica: Cinco letras que têm o poder de transformar o dia de alguém.  
+        E combinam perfeitamente com o seu “novo sobrenome”. 😉
       </div>
     </div>
   </div>
 
-  <div class="terminal" id="terminal" aria-live="polite"></div>
+  <!-- CONTEÚDO -->
+  <div class="terminal" id="terminal"></div>
   <div class="heart" id="heart">❤️</div>
 
   <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
 
+
 <script>
+/* ================================
+      CONFIGURAÇÕES
+================================ */
 const RELEASE_DATE = new Date(2025, 10, 13, 0, 0, 0);
 const SECRET = "smile";
 const MUSIC_FILE = "music.mp3";
-
-const startScreen = document.getElementById('start-screen');
-const openAuth = document.getElementById('openAuth');
-const authModal = document.getElementById('authModal');
-const passwordInput = document.getElementById('passwordInput');
-const submitPass = document.getElementById('submitPass');
-const authMsg = document.getElementById('authMsg');
-const countdownEl = document.getElementById('countdown');
-const terminal = document.getElementById('terminal');
-const heart = document.getElementById('heart');
 
 let music = new Audio(MUSIC_FILE);
 music.preload = 'auto';
@@ -174,30 +227,39 @@ const DURATION = 150;
 const FADE_IN_TIME = 5;
 const FADE_OUT_TIME = 10;
 
+/* ELEMENTOS */
+const startScreen = document.getElementById('start-screen');
+const openAuth = document.getElementById('openAuth');
+const authModal = document.getElementById('authModal');
+const passwordInput = document.getElementById('passwordInput');
+const submitPass = document.getElementById('submitPass');
+const authMsg = document.getElementById('authMsg');
+const countdownEl = document.getElementById('countdown');
+const terminal = document.getElementById('terminal');
+const heart = document.getElementById('heart');
+
 let activeDots = {};
 let currentLine = -1;
 let timelineIndex = 0;
 let pollTimer = null;
 
+/* TIMELINE */
 const TIMELINE = [
   { at: 0, action: () => showDots("Inicializando sistema") },
   { at: 12, action: () => showDots("Carregando lembranças") },
   { at: 28, action: () => showDots("Compilando sorrisos") },
   { at: 40, action: () => showDots("Renderizando carinho") },
   { at: 52, action: () => showDots("Executando surpresa") },
-  { at: 64, action: () => {
-      stopAllDots();
-      typeLine("Output: Feliz aniversário, Márcia 💫");
-    }
-  },
+  { at: 64, action: () => { stopAllDots(); typeLine("Output: Feliz aniversário, Márcia 💫"); }},
   { at: 76, action: () =>
-      typeLine("Você é a exceção mais linda da minha lógica ❤️", 100, () => {
+      typeLine("Você é a exceção mais linda da minha lógica ❤️", 95, () => {
         heart.classList.add("reveal");
       })
   },
   { at: DURATION - FADE_OUT_TIME, action: () => fadeOutMusicAndRestart() }
 ];
 
+/* TERMINAL FUNÇÕES */
 function newLine(text=""){
   currentLine++;
   const lines = terminal.textContent.split("\n");
@@ -208,12 +270,12 @@ function newLine(text=""){
 }
 
 function showDots(baseText){
-  const lineId = newLine(baseText);
+  const id = newLine(baseText);
   let dots = 0;
-  activeDots[lineId] = setInterval(()=>{
+  activeDots[id] = setInterval(()=>{
     dots = (dots + 1) % 4;
     const lines = terminal.textContent.split("\n");
-    lines[lineId] = baseText + '.'.repeat(dots);
+    lines[id] = baseText + '.'.repeat(dots);
     terminal.textContent = lines.join("\n");
   }, 500);
 }
@@ -224,34 +286,37 @@ function stopAllDots(){
 }
 
 function typeLine(text, speed=100, after=()=>{}){
-  const lineId = newLine("");
+  const id = newLine("");
   let i = 0;
-  const tick = setInterval(()=>{
+  const iv = setInterval(()=>{
     if (i < text.length){
       const lines = terminal.textContent.split("\n");
-      lines[lineId] = text.substring(0, i+1);
+      lines[id] = text.substring(0, i+1);
       terminal.textContent = lines.join("\n");
       i++;
     } else {
-      clearInterval(tick);
+      clearInterval(iv);
       after();
     }
   }, speed);
 }
 
+/* ÁUDIO */
 function fadeInMusic(){
   const step = 0.01;
   const iv = setInterval(()=>{
-    if (music.volume < 1) music.volume = Math.min(music.volume + step, 1);
-    else clearInterval(iv);
+    if (music.volume < 1){
+      music.volume = Math.min(music.volume + step, 1);
+    } else clearInterval(iv);
   }, FADE_IN_TIME * 20);
 }
 
 function fadeOutMusicAndRestart(){
   const step = 0.02;
   const iv = setInterval(()=>{
-    if (music.volume > 0.02) music.volume = Math.max(music.volume - step, 0);
-    else {
+    if (music.volume > 0.02){
+      music.volume = Math.max(music.volume - step, 0);
+    } else {
       clearInterval(iv);
       music.pause();
       smoothRestart();
@@ -259,14 +324,13 @@ function fadeOutMusicAndRestart(){
   }, FADE_OUT_TIME * 20);
 }
 
+/* REINÍCIO */
 function smoothRestart(){
   document.body.style.opacity = "0";
   setTimeout(()=>{
     terminal.textContent = "";
     heart.classList.remove("reveal");
     music = new Audio(MUSIC_FILE);
-    music.preload = "auto";
-    music.loop = false;
     music.volume = 0.5;
     currentLine = -1;
     timelineIndex = 0;
@@ -276,122 +340,121 @@ function smoothRestart(){
   }, 2200);
 }
 
+/* TIMELINE */
 function startTimeline(){
   terminal.textContent = "";
   currentLine = -1;
   timelineIndex = 0;
   music.currentTime = 0;
-  const playPromise = music.play();
-  if (playPromise !== undefined) {
-    playPromise.then(()=>{
-      fadeInMusic();
-      pollTimer = setInterval(()=>{
-        const t = music.currentTime;
-        while (timelineIndex < TIMELINE.length && t >= TIMELINE[timelineIndex].at){
-          TIMELINE[timelineIndex].action();
-          timelineIndex++;
-        }
-        if (timelineIndex >= TIMELINE.length) clearInterval(pollTimer);
-      }, 100);
-    }).catch(err => {
-      console.warn("Erro ao reproduzir (play):", err);
-      alert("O navegador bloqueou a reprodução automática do áudio. Clique novamente em 'Liberar' para tentar.");
-      openAuthModal();
-    });
-  }
+
+  music.play().then(()=>{
+    fadeInMusic();
+
+    pollTimer = setInterval(()=>{
+      const t = music.currentTime;
+      while (timelineIndex < TIMELINE.length && t >= TIMELINE[timelineIndex].at){
+        TIMELINE[timelineIndex].action();
+        timelineIndex++;
+      }
+      if (timelineIndex >= TIMELINE.length) clearInterval(pollTimer);
+    }, 100);
+
+  }).catch(err=>{
+    console.warn("Erro no áudio:", err);
+    alert("Clique novamente para liberar o áudio.");
+    openAuthModal();
+  });
 }
 
+/* LIBERAÇÃO POR DATA */
 function nowIsReleased(){
-  const now = new Date();
-  return now >= RELEASE_DATE;
+  return new Date() >= RELEASE_DATE;
 }
 
 function msToTimeParts(ms){
-  const total = Math.max(0, Math.floor(ms/1000));
-  const days = Math.floor(total / 86400);
-  const hours = Math.floor((total % 86400) / 3600);
-  const minutes = Math.floor((total % 3600) / 60);
-  const seconds = total % 60;
-  return {days,hours,minutes,seconds};
+  const s = Math.max(0, Math.floor(ms/1000));
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return {d,h,m,sec};
 }
 
-let countdownInterval = null;
+let countdownInterval=null;
 function startCountdown(){
   if (countdownInterval) clearInterval(countdownInterval);
   function tick(){
-    const now = new Date();
-    const diff = RELEASE_DATE - now;
-    if (diff <= 0){ 
+    const diff = RELEASE_DATE - new Date();
+    if (diff <= 0){
       countdownEl.textContent = "O sistema já pode ser liberado hoje. Digite a senha.";
       clearInterval(countdownInterval);
       return;
     }
     const p = msToTimeParts(diff);
-    countdownEl.textContent = `Faltam ${p.days}d ${p.hours}h ${p.minutes}m ${p.seconds}s para liberação.`;
+    countdownEl.textContent = `Faltam ${p.d}d ${p.h}h ${p.m}m ${p.sec}s para liberação.`;
   }
   tick();
   countdownInterval = setInterval(tick, 1000);
 }
 
+/* MODAL */
 function openAuthModal(){
   authModal.style.display = "flex";
-  authModal.setAttribute('aria-hidden','false');
   passwordInput.value = "";
   authMsg.textContent = "";
   countdownEl.textContent = "";
+
   if (!nowIsReleased()) startCountdown();
+
   passwordInput.focus();
 }
+function closeAuthModal(){ authModal.style.display="none"; }
 
-function closeAuthModal(){
-  authModal.style.display = "none";
-  authModal.setAttribute('aria-hidden','true');
-}
-
-function handleAuthSubmit() {
+/* SENHA */
+function handleAuthSubmit(){
   const typed = (passwordInput.value || "").trim();
 
-  if (!nowIsReleased()) {
+  if (!nowIsReleased()){
     authMsg.style.color = "#f4a7a7";
     authMsg.textContent = "Acesso negado. O sistema só será liberado na data marcada.";
     if (!countdownInterval) startCountdown();
     return;
   }
 
-  if (typed === SECRET) {
+  if (typed === SECRET){
     authMsg.style.color = "#b7f4c9";
     authMsg.textContent = "Senha correta — iniciando a surpresa...";
     document.getElementById("passwordHint").style.display = "none";
 
-    setTimeout(() => {
+    setTimeout(()=>{
       closeAuthModal();
       startScreen.style.opacity = "0";
-      setTimeout(() => {
+      setTimeout(()=>{
         startScreen.style.display = "none";
         startTimeline();
       }, 450);
     }, 450);
+
   } else {
     authMsg.style.color = "#f4a7a7";
     authMsg.textContent = "Senha incorreta. Tente novamente.";
     passwordInput.focus();
 
     const hint = document.getElementById("passwordHint");
-    if (hint.style.display === "none" || !hint.style.display) {
+    if (hint.style.display === "none" || !hint.style.display){
       hint.style.display = "block";
       hint.classList.add("fade-in");
     }
   }
 }
 
-openAuth.addEventListener('click', ()=>{ openAuthModal(); });
+/* EVENTOS */
+openAuth.addEventListener('click', openAuthModal);
 submitPass.addEventListener('click', handleAuthSubmit);
-passwordInput.addEventListener('keydown', (e)=>{
-  if (e.key === "Enter") handleAuthSubmit();
-});
-authModal.addEventListener('click', (e)=>{
-  if (e.target === authModal){ closeAuthModal(); }
-});
+passwordInput.addEventListener('keydown', e => { if (e.key === "Enter") handleAuthSubmit(); });
+authModal.addEventListener('click', e => { if (e.target === authModal) closeAuthModal(); });
+
 </script>
+
 </body>
 </html>

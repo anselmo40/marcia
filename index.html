@@ -6,13 +6,18 @@
   <title>Feliz Aniversário, Márcia 💫</title>
 
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color: transparent;}
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      -webkit-tap-highlight-color: transparent;
+    }
     html,body{height:100%}
     body{
       height:100vh;
-      background:#0e0e0e;
+      background:#050505;
       color:#f2f2f2;
-      font-family: 'Courier New', monospace;
+      font-family:'Courier New', monospace;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -20,15 +25,52 @@
       overflow:hidden;
       transition:opacity 1.5s ease-in-out;
       -webkit-text-size-adjust:100%;
+      position:relative;
     }
 
-    /* Terminal */
+    /* Partículas douradas de fundo */
+    #particles{
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+    .particle{
+      position:absolute;
+      width:3px;
+      height:3px;
+      border-radius:50%;
+      background:rgba(214,184,138,0.85);
+      opacity:0.0;
+      animation: floatUp linear infinite;
+      filter:blur(0.4px);
+    }
+    @keyframes floatUp{
+      0%{
+        transform:translate3d(0, 100vh, 0);
+        opacity:0;
+      }
+      20%{
+        opacity:0.5;
+      }
+      80%{
+        opacity:0.5;
+      }
+      100%{
+        transform:translate3d(0, -20vh, 0);
+        opacity:0;
+      }
+    }
+
+    /* Terminal com efeito CRT digital suave */
     .terminal{
-      width: min(860px,92%);
+      position:relative;
+      width:min(860px,92%);
       max-width:860px;
       padding:28px 32px;
       color:#e6d2b5;
-      background:transparent;
+      background:radial-gradient(circle at top, #1a1a1a 0%, #050505 60%, #000 100%);
       border-left:2px solid #d6b88a;
       border-right:2px solid #d6b88a;
       white-space:pre-wrap;
@@ -38,26 +80,53 @@
       margin-bottom:18px;
       font-size:1.05rem;
       word-break:break-word;
+      box-shadow:0 0 18px rgba(0,0,0,0.75), 0 0 32px rgba(214,184,138,0.16);
+      z-index:1;
+      overflow:hidden;
+    }
+    /* scanlines + glow leve */
+    .terminal::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size:100% 3px;
+      mix-blend-mode:soft-light;
+      opacity:0.28;
+    }
+    .terminal::after{
+      content:"";
+      position:absolute;
+      inset:-20%;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.17), transparent 55%),
+        radial-gradient(circle at bottom, rgba(0,0,0,0.7), transparent 60%);
+      mix-blend-mode:soft-light;
+      opacity:0.24;
+      pointer-events:none;
     }
 
-    /* Coração com animação pulsante */
+    /* Coração com pulso + glow */
     .heart{
       font-size:2.6rem;
       color:#ff2d55;
       opacity:0;
       transition:opacity .8s ease-in-out;
       margin-top:10px;
-      animation: pulse 1.35s infinite ease-in-out;
+      animation:pulse 1.35s infinite ease-in-out;
+      text-shadow:0 0 12px rgba(255,45,85,0.6), 0 0 26px rgba(255,45,85,0.35);
+      z-index:1;
     }
     .heart.reveal{opacity:1}
 
-    @keyframes pulse {
-      0%   { transform: scale(1); }
-      50%  { transform: scale(1.33); }
-      100% { transform: scale(1); }
+    @keyframes pulse{
+      0%  { transform:scale(1);   text-shadow:0 0 6px rgba(255,45,85,0.5), 0 0 18px rgba(255,45,85,0.2); }
+      50% { transform:scale(1.32);text-shadow:0 0 18px rgba(255,45,85,0.7), 0 0 34px rgba(255,45,85,0.45);}
+      100%{ transform:scale(1);   text-shadow:0 0 6px rgba(255,45,85,0.5), 0 0 18px rgba(255,45,85,0.2); }
     }
 
-    /* Footer */
     footer{
       position:absolute;
       bottom:12px;
@@ -65,6 +134,7 @@
       font-size:.85rem;
       text-align:center;
       width:100%;
+      z-index:1;
     }
 
     /* Tela inicial */
@@ -74,11 +144,11 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      background:linear-gradient(180deg, rgba(0,0,0,0.75), rgba(0,0,0,0.85));
+      background:radial-gradient(circle at top, rgba(0,0,0,0.8), rgba(0,0,0,0.96));
       z-index:40;
       transition:opacity .5s ease-in-out;
       flex-direction:column;
-      gap:14px;
+      gap:10px;
       color:#e6d2b5;
       text-align:center;
       padding:20px;
@@ -93,9 +163,25 @@
       cursor:pointer;
       font-family:'Courier New',monospace;
       font-size:1rem;
-      transition:transform .2s ease, background .2s ease;
+      transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
+      box-shadow:0 0 12px rgba(214,184,138,0.3);
+      margin-top:6px;
     }
-    #start-screen button:hover{transform:scale(1.04);background:#e6d2b5}
+    #start-screen button:hover{
+      transform:scale(1.04);
+      background:#e6d2b5;
+      box-shadow:0 0 20px rgba(214,184,138,0.45);
+    }
+
+    /* Log de boot de autenticação (pré-modal) */
+    #boot-log{
+      margin-top:16px;
+      font-size:.9rem;
+      color:#b9b9b9;
+      white-space:pre-wrap;
+      min-height:54px;
+      max-width:360px;
+    }
 
     /* Modal senha */
     #authModal{
@@ -112,10 +198,10 @@
       background:#0f0f0f;
       border:1px solid #2a2a2a;
       padding:22px;
-      width: min(460px,92%);
+      width:min(460px,92%);
       color:#e6d2b5;
       border-radius:12px;
-      box-shadow: 0 6px 30px rgba(0,0,0,0.6);
+      box-shadow:0 8px 32px rgba(0,0,0,0.75);
       text-align:left;
     }
     .authRow{display:flex;gap:8px;align-items:center;margin-top:12px}
@@ -150,16 +236,15 @@
     }
 
     /* Dica animada */
-    .fade-in {
-      opacity: 0;
-      animation: fadeIn 1s forwards ease-in-out;
+    .fade-in{
+      opacity:0;
+      animation:fadeIn 1s forwards ease-in-out;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeIn{
+      from{opacity:0;transform:translateY(5px);}
+      to  {opacity:1;transform:translateY(0);}
     }
 
-    /* Responsividade iPhone */
     @media (max-width:600px){
       .terminal{padding:16px;font-size:.95rem}
       .heart{font-size:2.3rem}
@@ -173,11 +258,15 @@
 
 <body>
 
+  <!-- Partículas de fundo -->
+  <div id="particles"></div>
+
   <!-- TELA INICIAL -->
   <div id="start-screen">
     <p>Clique para iniciar a surpresa 🎧</p>
     <button id="openAuth">Iniciar 💫</button>
-    <small style="color:#888;margin-top:8px">Você terá que digitar uma senha para liberar o presente</small>
+    <small style="color:#888;margin-top:4px">Você terá que digitar uma senha para liberar o presente</small>
+    <div id="boot-log"></div>
   </div>
 
   <!-- MODAL SENHA -->
@@ -203,7 +292,7 @@
     </div>
   </div>
 
-  <!-- CONTEÚDO -->
+  <!-- CONTEÚDO PRINCIPAL -->
   <div class="terminal" id="terminal"></div>
   <div class="heart" id="heart">❤️</div>
 
@@ -214,7 +303,7 @@
 /* ================================
       CONFIGURAÇÕES
 ================================ */
-const RELEASE_DATE = new Date(2025, 10, 15, 0, 0, 0);
+const RELEASE_DATE = new Date(2025, 10, 13, 0, 0, 0); // 13/11/2025
 const SECRET = "smile";
 const MUSIC_FILE = "music.mp3";
 
@@ -237,26 +326,31 @@ const authMsg = document.getElementById('authMsg');
 const countdownEl = document.getElementById('countdown');
 const terminal = document.getElementById('terminal');
 const heart = document.getElementById('heart');
+const bootLog = document.getElementById('boot-log');
 
 let activeDots = {};
 let currentLine = -1;
 let timelineIndex = 0;
 let pollTimer = null;
 
-/* TIMELINE */
+/* TIMELINE PRINCIPAL */
 const TIMELINE = [
-  { at: 0, action: () => showDots("Inicializando sistema") },
+  { at: 0,  action: () => showDots("Inicializando sistema") },
   { at: 12, action: () => showDots("Carregando lembranças") },
   { at: 28, action: () => showDots("Compilando sorrisos") },
   { at: 40, action: () => showDots("Renderizando carinho") },
   { at: 52, action: () => showDots("Executando surpresa") },
-  { at: 64, action: () => { stopAllDots(); typeLine("Output: Feliz aniversário, Márcia 💫"); }},
+  { at: 64, action: () => {
+      stopAllDots();
+      typeLine("Output: Feliz aniversário, Márcia 💫");
+    }
+  },
   { at: 76, action: () =>
       typeLine("Você é a exceção mais linda da minha lógica ❤️", 95, () => {
         heart.classList.add("reveal");
       })
   },
-  { at: DURATION - FADE_OUT_TIME, action: () => fadeOutMusicAndRestart() }
+  { at: DURATION - FADE_OUT_TIME, action: () => fadeOutMusicAndEndMessage() }
 ];
 
 /* TERMINAL FUNÇÕES */
@@ -311,7 +405,8 @@ function fadeInMusic(){
   }, FADE_IN_TIME * 20);
 }
 
-function fadeOutMusicAndRestart(){
+/* Mensagem final + fade-out + restart */
+function fadeOutMusicAndEndMessage(){
   const step = 0.02;
   const iv = setInterval(()=>{
     if (music.volume > 0.02){
@@ -319,7 +414,10 @@ function fadeOutMusicAndRestart(){
     } else {
       clearInterval(iv);
       music.pause();
-      smoothRestart();
+      // mensagem final surpresa
+      typeLine("> Obrigado por deixar meu mundo mais leve. ✨", 70, () => {
+        setTimeout(()=>smoothRestart(), 2200);
+      });
     }
   }, FADE_OUT_TIME * 20);
 }
@@ -337,10 +435,11 @@ function smoothRestart(){
     startScreen.style.display = "flex";
     startScreen.style.opacity = "1";
     document.body.style.opacity = "1";
+    bootLog.textContent = "";
   }, 2200);
 }
 
-/* TIMELINE */
+/* TIMELINE EXECUÇÃO */
 function startTimeline(){
   terminal.textContent = "";
   currentLine = -1;
@@ -380,7 +479,7 @@ function msToTimeParts(ms){
   return {d,h,m,sec};
 }
 
-let countdownInterval=null;
+let countdownInterval = null;
 function startCountdown(){
   if (countdownInterval) clearInterval(countdownInterval);
   function tick(){
@@ -403,12 +502,49 @@ function openAuthModal(){
   passwordInput.value = "";
   authMsg.textContent = "";
   countdownEl.textContent = "";
-
   if (!nowIsReleased()) startCountdown();
-
   passwordInput.focus();
 }
 function closeAuthModal(){ authModal.style.display="none"; }
+
+/* BOOT PRÉ-AUTENTICAÇÃO (opção 3 e 7 simplificada) */
+function startPreAuthBoot(){
+  openAuth.disabled = true;
+  bootLog.textContent = "";
+
+  const lines = [
+    "> carregando módulo de acesso...",
+    "> iniciando autenticação segura...",
+    "> preparando ambiente..."
+  ];
+  let idxLine = 0;
+  function typeNext(){
+    if (idxLine >= lines.length){
+      setTimeout(()=>{
+        openAuthModal();
+        openAuth.disabled = false;
+      }, 400);
+      return;
+    }
+    let i = 0;
+    const line = lines[idxLine];
+    if (idxLine === 0) bootLog.textContent = "";
+    bootLog.textContent += (idxLine > 0 ? "\n" : "");
+    const iv = setInterval(()=>{
+      if (i <= line.length){
+        const txt = bootLog.textContent.split("\n");
+        txt[idxLine] = line.substring(0, i);
+        bootLog.textContent = txt.join("\n");
+        i++;
+      } else {
+        clearInterval(iv);
+        idxLine++;
+        setTimeout(typeNext, 300);
+      }
+    }, 40);
+  }
+  typeNext();
+}
 
 /* SENHA */
 function handleAuthSubmit(){
@@ -448,11 +584,31 @@ function handleAuthSubmit(){
   }
 }
 
+/* PARTÍCULAS */
+function initParticles(){
+  const container = document.getElementById('particles');
+  const count = 30;
+  for (let i=0;i<count;i++){
+    const p = document.createElement('span');
+    p.className = 'particle';
+    const left = Math.random()*100;
+    const delay = Math.random()*18;
+    const duration = 14 + Math.random()*10;
+    p.style.left = left + '%';
+    p.style.animationDuration = duration + 's';
+    p.style.animationDelay = delay + 's';
+    container.appendChild(p);
+  }
+}
+
 /* EVENTOS */
-openAuth.addEventListener('click', openAuthModal);
+openAuth.addEventListener('click', startPreAuthBoot);
 submitPass.addEventListener('click', handleAuthSubmit);
 passwordInput.addEventListener('keydown', e => { if (e.key === "Enter") handleAuthSubmit(); });
 authModal.addEventListener('click', e => { if (e.target === authModal) closeAuthModal(); });
+
+/* INIT */
+initParticles();
 
 </script>
 

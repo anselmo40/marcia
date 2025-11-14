@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1" />
-  <title>Feliz Aniversário, Márcia ❤️</title>
+  <title>Feliz Aniversário, Márcia 💫</title>
 
   <style>
     *{
@@ -248,6 +248,42 @@
       to  {opacity:1;transform:translateY(0);}
     }
 
+    /* Overlay da câmera / selfie */
+    #cameraOverlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.85);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:90;
+      padding:20px;
+    }
+    .cameraBox{
+      background:#0f0f0f;
+      border:1px solid #2a2a2a;
+      border-radius:12px;
+      padding:16px;
+      width:min(420px, 95%);
+      color:#e6d2b5;
+      text-align:center;
+      box-shadow:0 8px 32px rgba(0,0,0,0.8);
+    }
+    .cameraBox p{
+      margin-bottom:10px;
+      font-size:.98rem;
+    }
+    #cameraVideo{
+      width:100%;
+      border-radius:10px;
+      background:#000;
+    }
+    .cameraHint{
+      margin-top:8px;
+      font-size:.85rem;
+      color:#bbb;
+    }
+
     @media (max-width:600px){
       .terminal{padding:16px;font-size:.95rem}
       .heart{font-size:2.3rem}
@@ -295,6 +331,18 @@
     </div>
   </div>
 
+  <!-- OVERLAY CÂMERA -->
+  <div id="cameraOverlay">
+    <div class="cameraBox">
+      <p>Antes de tudo, deixa eu registrar esse sorriso? 😊</p>
+      <video id="cameraVideo" autoplay playsinline></video>
+      <div class="cameraHint">A foto é só sua — e depois a surpresa começa.</div>
+    </div>
+  </div>
+
+  <!-- CANVAS oculto para captura -->
+  <canvas id="cameraCanvas" style="display:none;"></canvas>
+
   <!-- CONTEÚDO PRINCIPAL -->
   <div class="terminal" id="terminal"></div>
   <div class="heart" id="heart">❤️</div>
@@ -306,7 +354,7 @@
 /* ================================
       CONFIGURAÇÕES
 ================================ */
-const RELEASE_DATE = new Date(2025, 10, 15, 0, 0, 0); // 13/11/2025
+const RELEASE_DATE = new Date(2025, 10, 13, 0, 0, 0); // 13/11/2025
 const SECRET = "smile";
 const MUSIC_FILE = "music.mp3";
 
@@ -331,6 +379,12 @@ const terminal = document.getElementById('terminal');
 const heart = document.getElementById('heart');
 const bootLog = document.getElementById('boot-log');
 
+const cameraOverlay = document.getElementById('cameraOverlay');
+const cameraVideo = document.getElementById('cameraVideo');
+const cameraCanvas = document.getElementById('cameraCanvas');
+
+let cameraStream = null;
+
 let activeDots = {};
 let currentLine = -1;
 let timelineIndex = 0;
@@ -345,7 +399,7 @@ const TIMELINE = [
   { at: 52, action: () => showDots("Executando surpresa") },
   { at: 64, action: () => {
       stopAllDots();
-      typeLine("Output: Feliz aniversário, Márcia 🌹");
+      typeLine("Output: Feliz aniversário, Márcia 💫");
     }
   },
   { at: 76, action: () =>
@@ -418,7 +472,7 @@ function fadeOutMusicAndEndMessage(){
       clearInterval(iv);
       music.pause();
       // mensagem final surpresa
-      typeLine("> Kernel report: sorriso detectado — pico máximo de luz registrado. E que privilégio é ver você sorrir. 😄", 70, () => {
+      typeLine("> Kernel report: sorriso detectado — pico máximo de luz registrado. E que privilégio é ver você sorrir. ✨", 70, () => {
         setTimeout(()=>smoothRestart(), 2200);
       });
     }
@@ -466,6 +520,73 @@ function startTimeline(){
     alert("Clique novamente para liberar o áudio.");
     openAuthModal();
   });
+}
+
+/* CÂMERA / SELFIE */
+async function startCameraAndSelfie(){
+  // se navegador não suporta, segue normal
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    startTimeline();
+    return;
+  }
+
+  try{
+    cameraOverlay.style.display = "flex";
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false
+    });
+    cameraVideo.srcObject = cameraStream;
+
+    // espera 2 segundos e captura
+    setTimeout(captureSelfie, 2000);
+
+  } catch(e){
+    console.warn("Erro ao acessar câmera:", e);
+    cameraOverlay.style.display = "none";
+    startTimeline();
+  }
+}
+
+function captureSelfie(){
+  if (!cameraStream){
+    cameraOverlay.style.display = "none";
+    startTimeline();
+    return;
+  }
+
+  const track = cameraStream.getVideoTracks()[0];
+  const settings = track.getSettings();
+  const w = settings.width || 640;
+  const h = settings.height || 480;
+
+  cameraCanvas.width = w;
+  cameraCanvas.height = h;
+
+  const ctx = cameraCanvas.getContext('2d');
+  ctx.drawImage(cameraVideo, 0, 0, w, h);
+
+  // para a câmera
+  cameraStream.getTracks().forEach(t => t.stop());
+  cameraStream = null;
+
+  // esconde overlay
+  cameraOverlay.style.display = "none";
+
+  try{
+    const dataUrl = cameraCanvas.toDataURL("image/jpeg", 0.9);
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'smile-marcia-' + Date.now() + '.jpg';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch(e){
+    console.warn("Falha ao gerar download da selfie:", e);
+  }
+
+  // segue com a surpresa
+  startTimeline();
 }
 
 /* LIBERAÇÃO POR DATA */
@@ -571,7 +692,8 @@ function handleAuthSubmit(){
       startScreen.style.opacity = "0";
       setTimeout(()=>{
         startScreen.style.display = "none";
-        startTimeline();
+        // 👉 aqui entra o fluxo da SELFIE
+        startCameraAndSelfie();
       }, 450);
     }, 450);
 

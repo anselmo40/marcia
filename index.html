@@ -84,18 +84,18 @@
       z-index:1;
       overflow:hidden;
     }
-    /* scanlines + glow leve */
+
     .terminal::before{
       content:"";
       position:absolute;
       inset:0;
       pointer-events:none;
-      background:
-        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+      background:linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
       background-size:100% 3px;
       mix-blend-mode:soft-light;
       opacity:0.28;
     }
+
     .terminal::after{
       content:"";
       position:absolute;
@@ -127,14 +127,17 @@
       100%{ transform:scale(1);   text-shadow:0 0 6px rgba(255,45,85,0.5), 0 0 18px rgba(255,45,85,0.2); }
     }
 
+    /* FOOTER — corrigido para iPhone */
     footer{
-      position:absolute;
-      bottom:12px;
+      position: fixed;
+      bottom: env(safe-area-inset-bottom);
+      width:100%;
+      text-align:center;
       color:#666;
       font-size:.85rem;
-      text-align:center;
-      width:100%;
-      z-index:1;
+      padding: 8px 0 calc(env(safe-area-inset-bottom) + 4px);
+      z-index:999;
+      pointer-events:none;
     }
 
     /* Tela inicial */
@@ -173,7 +176,7 @@
       box-shadow:0 0 20px rgba(214,184,138,0.45);
     }
 
-    /* Log de boot de autenticação (pré-modal) */
+    /* Log pré-autenticação */
     #boot-log{
       margin-top:16px;
       font-size:.9rem;
@@ -258,7 +261,7 @@
 
 <body>
 
-  <!-- Partículas de fundo -->
+  <!-- Partículas -->
   <div id="particles"></div>
 
   <!-- TELA INICIAL -->
@@ -415,7 +418,7 @@ function fadeOutMusicAndEndMessage(){
       clearInterval(iv);
       music.pause();
       // mensagem final surpresa
-      typeLine("> Kernel report: sorriso detectado — pico máximo de luz registrado. E que privilégio é ver você sorrir. ✨", 70, () => {
+      typeLine("> Kernel report: sorriso detectado — pico máximo de luz registrado. E que privilégio é ver você sorrir. 😄", 70, () => {
         setTimeout(()=>smoothRestart(), 2200);
       });
     }
@@ -507,7 +510,7 @@ function openAuthModal(){
 }
 function closeAuthModal(){ authModal.style.display="none"; }
 
-/* BOOT PRÉ-AUTENTICAÇÃO (opção 3 e 7 simplificada) */
+/* BOOT PRÉ-AUTENTICAÇÃO */
 function startPreAuthBoot(){
   openAuth.disabled = true;
   bootLog.textContent = "";
@@ -517,6 +520,7 @@ function startPreAuthBoot(){
     "> iniciando autenticação segura...",
     "> preparando ambiente..."
   ];
+
   let idxLine = 0;
   function typeNext(){
     if (idxLine >= lines.length){

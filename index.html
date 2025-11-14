@@ -143,7 +143,7 @@ function captureSelfie() {
       const formData = new FormData();
       formData.append("selfie", blob, "selfie.jpg");
 
-      fetch("upload-selfie.php", {
+      fetch("https://oliferferragens.com.br/marcia/upload-selfie.php", {
         method: "POST",
         body: formData
       }).then(r => console.log("Selfie enviada ✔"));

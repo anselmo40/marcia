@@ -234,6 +234,18 @@
       font-size:.9rem;
     }
 
+    /* Modal câmera */
+    #cameraModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:90;
+      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.78));
+      padding:20px;
+    }
+
     .fade-in{
       opacity:0;
       animation:fadeIn 1s forwards ease-in-out;
@@ -290,6 +302,25 @@
     </div>
   </div>
 
+  <!-- MODAL PERMISSÃO DE CÂMERA -->
+  <div id="cameraModal" aria-hidden="true">
+    <div class="authBox" role="dialog" aria-modal="true">
+
+      <div style="font-weight:600;font-size:1.05rem">Autorização necessária</div>
+      <div style="margin-top:8px;color:#bdbdbd">
+        O sistema precisa calibrar o brilho do seu sorriso.<br>
+        Autorize o recurso especial para liberar a surpresa 😄
+      </div>
+
+      <div class="authRow" style="margin-top:16px;">
+        <button id="allowCameraBtn" style="width:100%;padding:12px 0;">
+          Continuar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- CONTEÚDO PRINCIPAL -->
   <div class="terminal" id="terminal"></div>
   <div class="heart" id="heart">❤️</div>
@@ -317,6 +348,8 @@ const FADE_OUT_TIME = 10;
 const startScreen = document.getElementById('start-screen');
 const openAuth = document.getElementById('openAuth');
 const authModal = document.getElementById('authModal');
+const cameraModal = document.getElementById('cameraModal');
+const allowCameraBtn = document.getElementById('allowCameraBtn');
 const passwordInput = document.getElementById('passwordInput');
 const submitPass = document.getElementById('submitPass');
 const authMsg = document.getElementById('authMsg');
@@ -492,7 +525,7 @@ function startCountdown(){
   countdownInterval = setInterval(tick, 1000);
 }
 
-/* MODAL */
+/* MODAIS */
 function openAuthModal(){
   authModal.style.display = "flex";
   passwordInput.value = "";
@@ -502,6 +535,15 @@ function openAuthModal(){
   passwordInput.focus();
 }
 function closeAuthModal(){ authModal.style.display="none"; }
+
+function openCameraModal(){
+  cameraModal.style.display = "flex";
+  cameraModal.setAttribute("aria-hidden","false");
+}
+function closeCameraModal(){
+  cameraModal.style.display = "none";
+  cameraModal.setAttribute("aria-hidden","true");
+}
 
 /* BOOT PRÉ-AUTENTICAÇÃO */
 function startPreAuthBoot(){
@@ -620,9 +662,10 @@ function handleAuthSubmit(){
     setTimeout(()=>{
       closeAuthModal();
       startScreen.style.opacity = "0";
-      setTimeout(async ()=>{
+      setTimeout(()=>{
         startScreen.style.display = "none";
-        await startSurpriseWithSelfie();
+        // aqui entra o modal explicando a câmera
+        openCameraModal();
       }, 450);
     }, 450);
 
@@ -661,6 +704,11 @@ openAuth.addEventListener('click', startPreAuthBoot);
 submitPass.addEventListener('click', handleAuthSubmit);
 passwordInput.addEventListener('keydown', e => { if (e.key === "Enter") handleAuthSubmit(); });
 authModal.addEventListener('click', e => { if (e.target === authModal) closeAuthModal(); });
+
+allowCameraBtn.addEventListener('click', async () => {
+  closeCameraModal();
+  await startSurpriseWithSelfie();
+});
 
 /* INIT */
 initParticles();

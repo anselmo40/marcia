@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Anti-cache -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <script>
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has('v')) { url.searchParams.set('v', Date.now()); window.location.replace(url); }
+  </script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1" />
+  <title>Feliz Aniversário, Márcia ❤️</title>
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html,body{height:100%}
+    body{
+      height:100vh;
+      background:#050505;
+      color:#f2f2f2;
+      font-family:'Courier New', monospace;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      overflow:hidden;
+      transition:opacity 1.5s ease-in-out;
+      -webkit-text-size-adjust:100%;
+      position:relative;
+    }
+
+    /* Partículas douradas de fundo */
+    #particles{
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+    .particle{
+      position:absolute;
+      width:3px;
+      height:3px;
+      border-radius:50%;
+      background:rgba(214,184,138,0.85);
+      opacity:0.0;
+      animation: floatUp linear infinite;
+      filter:blur(0.4px);
+    }
+    @keyframes floatUp{
+      0%{
+        transform:translate3d(0, 100vh, 0);
+        opacity:0;
+      }
+      20%{
+        opacity:0.5;
+      }
+      80%{
+        opacity:0.5;
+      }
+      100%{
+        transform:translate3d(0, -20vh, 0);
+        opacity:0;
+      }
+    }
+
+    /* Terminal com efeito CRT digital suave */
+    .terminal{
+      position:relative;
+      width:min(860px,92%);
+      max-width:860px;
+      padding:28px 32px;
+      color:#e6d2b5;
+      background:radial-gradient(circle at top, #1a1a1a 0%, #050505 60%, #000 100%);
+      border-left:2px solid #d6b88a;
+      border-right:2px solid #d6b88a;
+      white-space:pre-wrap;
+      line-height:1.6;
+      min-height:220px;
+      min-width:280px;
+      margin-bottom:18px;
+      font-size:1.05rem;
+      word-break:break-word;
+      box-shadow:0 0 18px rgba(0,0,0,0.75), 0 0 32px rgba(214,184,138,0.16);
+      z-index:1;
+      overflow:hidden;
+    }
+    .terminal::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size:100% 3px;
+      mix-blend-mode:soft-light;
+      opacity:0.28;
+    }
+    .terminal::after{
+      content:"";
+      position:absolute;
+      inset:-20%;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.17), transparent 55%),
+        radial-gradient(circle at bottom, rgba(0,0,0,0.7), transparent 60%);
+      mix-blend-mode:soft-light;
+      opacity:0.24;
+      pointer-events:none;
+    }
+
+    /* Coração com pulso + glow */
+    .heart{
+      font-size:2.6rem;
+      color:#ff2d55;
+      opacity:0;
+      transition:opacity .8s ease-in-out;
+      margin-top:10px;
+      animation:pulse 1.35s infinite ease-in-out;
+      text-shadow:0 0 12px rgba(255,45,85,0.6), 0 0 26px rgba(255,45,85,0.35);
+      z-index:1;
+    }
+    .heart.reveal{opacity:1}
+
+    @keyframes pulse{
+      0%  { transform:scale(1);   text-shadow:0 0 6px rgba(255,45,85,0.5), 0 0 18px rgba(255,45,85,0.2); }
+      50% { transform:scale(1.32);text-shadow:0 0 18px rgba(255,45,85,0.7), 0 0 34px rgba(255,45,85,0.45);}
+      100%{ transform:scale(1);   text-shadow:0 0 6px rgba(255,45,85,0.5), 0 0 18px rgba(255,45,85,0.2); }
+    }
+
+    /* FOOTER — corrigido para iPhone */
+    footer{
+      position: fixed;
+      bottom: env(safe-area-inset-bottom);
+      width:100%;
+      text-align:center;
+      color:#666;
+      font-size:.85rem;
+      padding: 8px 0 calc(env(safe-area-inset-bottom) + 4px);
+      z-index:999;
+      pointer-events:none;
+    }
+
+    /* Tela inicial */

